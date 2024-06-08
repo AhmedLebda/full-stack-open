@@ -1,12 +1,14 @@
 const express = require("express");
 const morgan = require("morgan");
+const cors = require("cors");
+
 const data = require("./data.cjs");
 const utils = require("./utils.cjs");
 
 let PhoneBook = data;
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
@@ -17,6 +19,9 @@ app.use(
         ":method :url :status :res[content-length] - :response-time ms :req-body"
     )
 );
+
+// Cors
+app.use(cors());
 
 app.get("/api/persons", (req, res) => {
     if (!PhoneBook) {
