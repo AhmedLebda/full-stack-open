@@ -9,7 +9,14 @@ const app = express();
 const PORT = 3000;
 
 app.use(express.json());
-app.use(morgan("tiny"));
+
+// Define a custom token for logging request body
+morgan.token("req-body", (req, res) => JSON.stringify(req.body));
+app.use(
+    morgan(
+        ":method :url :status :res[content-length] - :response-time ms :req-body"
+    )
+);
 
 app.get("/api/persons", (req, res) => {
     if (!PhoneBook) {
@@ -71,6 +78,11 @@ app.delete("/api/persons/:id", (req, res) => {
 
 app.get("/api/info", (req, res) => {
     res.json({ entries: PhoneBook.length, timestamp: new Date().toString() });
+});
+
+// Unknown endpoint
+app.use((req, res) => {
+    res.sendStatus(404);
 });
 
 app.listen(PORT, () => console.log("your server is running on port:" + PORT));
