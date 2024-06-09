@@ -1,19 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Filter from "./components/Filter";
 import CreateContactForm from "./components/CreateContactForm";
 import { Contacts } from "./components/Contacts";
 import SectionHeader from "./components/SectionHeader";
 
+import api from "./api";
+
 const App = () => {
-    const [persons, setPersons] = useState([
-        { name: "Arto Hellas", number: "040-123456", id: 1 },
-        { name: "Ada Lovelace", number: "39-44-5323523", id: 2 },
-        { name: "Dan Abramov", number: "12-43-234345", id: 3 },
-        { name: "Mary Poppendieck", number: "39-23-6423122", id: 4 },
-    ]);
+    const [persons, setPersons] = useState([]);
     const [name, setName] = useState("");
     const [number, setNumber] = useState("");
     const [filter, setFilter] = useState("");
+
+    useEffect(() => {
+        api.getAllContacts().then((contacts) => setPersons(contacts));
+    }, []);
 
     const filteredPersons = filter.length
         ? persons.filter(
@@ -29,25 +30,43 @@ const App = () => {
 
     const handleNumberChange = (e) => setNumber(e.target.value);
 
-    const handleFormSubmit = (event) => {
+    const handleFormSubmit = async (event) => {
         event.preventDefault();
 
-        const contact = persons.find(
-            (person) =>
-                person.name.toLowerCase() === name.toLowerCase() ||
-                person.number === number
-        );
+        try {
+            const contactExists = persons.find(
+                (contact) => contact.name.toLowerCase() === name.toLowerCase()
+            );
 
-        if (contact) {
-            alert(`${contact.name} is already in the phone book`);
+            if (contactExists) {
+                if (
+                    confirm(
+                        `${contactExists.name} is already in your phone book, do you want to replace the old number with the new one?`
+                    )
+                ) {
+                    const contacts = await api.updateContact({ name, number });
+                    setPersons(contacts);
+                }
+            } else {
+                const contact = await api.addContact({ name, number });
+                setPersons([...persons, contact]);
+            }
             setName("");
             setNumber("");
-            return;
+        } catch (error) {
+            console.log(error);
         }
+    };
 
-        setPersons([...persons, { name, number }]);
-        setName("");
-        setNumber("");
+    const handleContactDelete = async (id) => {
+        try {
+            const response = await api.deleteContact(id);
+            setPersons(response.contacts);
+            setName("");
+            setNumber("");
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     return (
@@ -66,7 +85,10 @@ const App = () => {
 
             <SectionHeader text="Numbers" />
 
-            <Contacts contacts={filteredPersons} />
+            <Contacts
+                contacts={filteredPersons}
+                onContactDelete={handleContactDelete}
+            />
         </div>
     );
 };

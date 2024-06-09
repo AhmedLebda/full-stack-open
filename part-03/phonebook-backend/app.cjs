@@ -40,16 +40,34 @@ app.post("/api/persons", (req, res) => {
             error: "you need to enter a name and number for your contact",
         });
     }
-    const contactExists = PhoneBook.find((contact) => contact.name === name);
-    if (contactExists) {
-        return res.status(400).json({
-            error: "This contact already exists",
-        });
-    }
+    // const contactExists = PhoneBook.find(
+    //     (contact) => contact.name.toLowerCase() === name.toLowerCase()
+    // );
+    // if (contactExists) {
+    //     return res.status(400).json({
+    //         error: "This contact already exists",
+    //     });
+    // }
 
     const createdContact = { id: utils.generateRandomId(), ...req.body };
     PhoneBook.push(createdContact);
     res.json(createdContact);
+});
+
+app.put("/api/persons", (req, res) => {
+    const { name, number } = req.body;
+    if (!name || !number) {
+        return res.status(400).json({
+            error: "you need to enter a name and number for your contact",
+        });
+    }
+    const updatedPhoneBook = PhoneBook.map((contact) =>
+        contact.name.toLowerCase() === name.toLowerCase()
+            ? { ...contact, number }
+            : contact
+    );
+
+    res.json(updatedPhoneBook);
 });
 
 app.get("/api/persons/:id", (req, res) => {
@@ -67,9 +85,9 @@ app.get("/api/persons/:id", (req, res) => {
 app.delete("/api/persons/:id", (req, res) => {
     const id = req.params.id;
 
-    const targetContact = PhoneBook.find((contact) => contact.id === +id);
+    const targetContact = PhoneBook.find((contact) => contact.id === id);
 
-    const filteredContacts = PhoneBook.filter((contact) => contact.id !== +id);
+    const filteredContacts = PhoneBook.filter((contact) => contact.id !== id);
 
     PhoneBook = filteredContacts;
 
