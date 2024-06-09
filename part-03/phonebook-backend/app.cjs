@@ -75,7 +75,7 @@ app.put("/api/persons", (req, res) => {
 
 app.get("/api/persons/:id", (req, res) => {
     const id = req.params.id;
-    const contact = PhoneBook.find((contact) => contact.id === +id);
+    const contact = PhoneBook.find((contact) => contact.id === id);
 
     if (!contact) {
         return res.status(400).json({
