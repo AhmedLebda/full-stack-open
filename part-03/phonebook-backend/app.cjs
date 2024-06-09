@@ -1,15 +1,14 @@
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
+const mongoose = require("mongoose");
 
-const data = require("./data.cjs");
-const utils = require("./utils.cjs");
-
-let PhoneBook = data;
+//### Routes
+const persons_routes = require("./routes/persons.cjs");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
+//### Middlewares
 app.use(express.json());
 
 // Define a custom token for logging request body
@@ -20,95 +19,35 @@ app.use(
     )
 );
 
+mongoose.set("strictQuery", false);
+
 // Cors
 app.use(cors());
 
 // Statics
 app.use(express.static("public"));
 
-app.get("/api/persons", (req, res) => {
-    if (!PhoneBook) {
-        return res
-            .status(400)
-            .json({ error: "There are no contacts in the phonebook" });
-    }
-    res.json(PhoneBook);
-});
+// Connection
+main();
 
-app.post("/api/persons", (req, res) => {
-    const { name, number } = req.body;
-
-    if (!name || !number) {
-        return res.status(400).json({
-            error: "you need to enter a name and number for your contact",
-        });
-    }
-    // const contactExists = PhoneBook.find(
-    //     (contact) => contact.name.toLowerCase() === name.toLowerCase()
-    // );
-    // if (contactExists) {
-    //     return res.status(400).json({
-    //         error: "This contact already exists",
-    //     });
-    // }
-
-    const createdContact = { id: utils.generateRandomId(), ...req.body };
-    PhoneBook.push(createdContact);
-    res.json(createdContact);
-});
-
-app.put("/api/persons", (req, res) => {
-    const { name, number } = req.body;
-    if (!name || !number) {
-        return res.status(400).json({
-            error: "you need to enter a name and number for your contact",
-        });
-    }
-    const updatedPhoneBook = PhoneBook.map((contact) =>
-        contact.name.toLowerCase() === name.toLowerCase()
-            ? { ...contact, number }
-            : contact
-    );
-
-    res.json(updatedPhoneBook);
-});
-
-app.get("/api/persons/:id", (req, res) => {
-    const id = req.params.id;
-    const contact = PhoneBook.find((contact) => contact.id === id);
-
-    if (!contact) {
-        return res.status(400).json({
-            error: "This contact doesn't exist in the phonebook",
-        });
-    }
-    res.json(contact);
-});
-
-app.delete("/api/persons/:id", (req, res) => {
-    const id = req.params.id;
-
-    const targetContact = PhoneBook.find((contact) => contact.id === id);
-
-    const filteredContacts = PhoneBook.filter((contact) => contact.id !== id);
-
-    PhoneBook = filteredContacts;
-
-    if (!targetContact) {
-        return res.status(400).json({
-            error: "This contact doesn't exist in the phonebook",
-        });
-    }
-    res.json({ msg: `${targetContact.name} is deleted!`, contacts: PhoneBook });
-});
-
-app.get("/api/info", (req, res) => {
-    res.json({ entries: PhoneBook.length, timestamp: new Date().toString() });
-});
+// Routes
+app.use("/api/persons", persons_routes);
 
 // Unknown endpoint
 app.use((req, res) => {
     res.sendStatus(404);
 });
 
-app.listen(PORT, () => console.log("your server is running on port:" + PORT));
+async function main() {
+    const url = process.env.DB_CONNECTION;
+    try {
+        await mongoose.connect(url);
+        console.log(`Successfully connected to "phone_book" db`);
+
+        app.listen(process.env.PORT, () =>
+            console.log("your server is running on port:" + process.env.PORT)
+        );
+    } catch (err) {
+        console.log(err.message);
+    }
+}
