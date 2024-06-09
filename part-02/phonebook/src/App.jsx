@@ -44,8 +44,17 @@ const App = () => {
                         `${contactExists.name} is already in your phone book, do you want to replace the old number with the new one?`
                     )
                 ) {
-                    const contacts = await api.updateContact({ name, number });
-                    setPersons(contacts);
+                    const updatedContact = await api.updateContact(
+                        contactExists
+                    );
+
+                    setPersons(
+                        persons.map((contact) =>
+                            contact.id === updatedContact.id
+                                ? updatedContact
+                                : contact
+                        )
+                    );
                 }
             } else {
                 const contact = await api.addContact({ name, number });
@@ -60,8 +69,10 @@ const App = () => {
 
     const handleContactDelete = async (id) => {
         try {
-            const response = await api.deleteContact(id);
-            setPersons(response.contacts);
+            const deletedContact = await api.deleteContact(id);
+            setPersons(
+                persons.filter((contact) => contact.id !== deletedContact.id)
+            );
             setName("");
             setNumber("");
         } catch (error) {
