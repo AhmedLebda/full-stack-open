@@ -23,6 +23,9 @@ app.use(
 // Cors
 app.use(cors());
 
+// Statics
+app.use(express.static("public"));
+
 app.get("/api/persons", (req, res) => {
     if (!PhoneBook) {
         return res
