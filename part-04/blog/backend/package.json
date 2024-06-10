@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "node --env-file=.env --watch ./app.cjs",
     "start": "node ./app.cjs",
-    "build:ui": "rm -rf public && cd ../frontend && npm run build && cp -r dist ../backend/public"
+    "build:ui": "rm -rf public && cd ../frontend && npm run build && cp -r dist ../backend/public",
+    "test": "node --test"
   },
   "keywords": [],
   "author": "",
