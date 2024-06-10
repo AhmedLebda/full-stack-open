@@ -2,7 +2,8 @@ const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
 const mongoose = require("mongoose");
-const errorhandler = require("./middlewares/errorHandler.cjs");
+const errorhandler = require("./utils/middlewares/errorHandler.cjs");
+const config = require("./utils/config.cjs");
 
 //### Routes
 const persons_routes = require("./routes/persons.cjs");
@@ -42,13 +43,12 @@ app.use((req, res) => {
 app.use(errorhandler);
 
 async function main() {
-    const url = process.env.DB_CONNECTION;
     try {
-        await mongoose.connect(url);
+        await mongoose.connect(config.MONGO_URI);
         console.log(`Successfully connected to "phone_book" db`);
 
-        app.listen(process.env.PORT, () =>
-            console.log("your server is running on port:" + process.env.PORT)
+        app.listen(config.PORT, () =>
+            console.log("your server is running on port:" + config.PORT)
         );
     } catch (err) {
         console.log(err.message);
