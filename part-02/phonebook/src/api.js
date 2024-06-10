@@ -20,19 +20,22 @@ const addContact = async (contact) => {
     });
 
     if (!response.ok) {
-        throw Error(response.error);
+        const error = await response.json();
+        throw Error(error.error);
     }
 
     return await response.json();
 };
 
 const deleteContact = async (contactId) => {
+    const controller = new AbortController();
     const response = await fetch(`${baseUrl}/persons/${contactId}`, {
         method: "DELETE",
         mode: "cors",
         headers: {
             "Content-Type": "application/json",
         },
+        signal: controller.signal,
     });
 
     if (!response.ok) {

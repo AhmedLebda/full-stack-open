@@ -11,16 +11,14 @@ const contacts_list = async (req, res) => {
     res.json(contacts);
 };
 
-const contact_create = async (req, res) => {
+const contact_create = async (req, res, next) => {
     const { name, number } = req.body;
 
-    if (!name || !number) {
-        return res.status(400).json({
-            error: "you need to enter a name and number for your contact",
-        });
-    }
-
     try {
+        if (!name || !number) {
+            throw Error("you need to enter a name and number for your contact");
+        }
+
         const contactExists = await Contact.find({ name });
 
         if (Object.keys(contactExists).length) {
@@ -36,43 +34,53 @@ const contact_create = async (req, res) => {
 
         res.json(createdContact);
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        next(error);
     }
 };
 
-const contact_update = async (req, res) => {
+const contact_update = async (req, res, next) => {
     const { number, id } = req.body;
+
     try {
+        if (!number) {
+            throw Error("You need to enter contact number");
+        }
+
         const updatedContact = await Contact.findByIdAndUpdate(
             id,
             { number },
-            { new: true }
+            { new: true, runValidators: true, context: "query" }
         );
         res.json(updatedContact);
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        next(error);
     }
 };
 
-const contact_details = async (req, res) => {
+const contact_details = async (req, res, next) => {
     const id = req.params.id;
     try {
         const contact = await Contact.findById(id);
 
         res.json(contact);
     } catch (error) {
-        res.status(400).json({ error: "This contact doesn't exist" });
+        next(error);
     }
 };
 
-const contact_delete = async (req, res) => {
+const contact_delete = async (req, res, next) => {
     const id = req.params.id;
 
     try {
         const contact = await Contact.findByIdAndDelete(id);
+
+        if (!contact) {
+            throw Error("Contact not found!");
+        }
+
         res.json(contact);
     } catch (error) {
-        res.status(400).json({ error: "This contact doesn't exist" });
+        next(error);
     }
 };
 

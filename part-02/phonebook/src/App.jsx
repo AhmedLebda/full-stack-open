@@ -5,12 +5,14 @@ import { Contacts } from "./components/Contacts";
 import SectionHeader from "./components/SectionHeader";
 
 import api from "./api";
+import { sleep } from "./utils";
 
 const App = () => {
     const [persons, setPersons] = useState([]);
     const [name, setName] = useState("");
     const [number, setNumber] = useState("");
     const [filter, setFilter] = useState("");
+    const [notification, setNotification] = useState(null);
 
     useEffect(() => {
         api.getAllContacts().then((contacts) => setPersons(contacts));
@@ -24,15 +26,20 @@ const App = () => {
           )
         : persons;
 
+    const showNotification = async (type, msg) => {
+        if (!notification) {
+            setNotification({ type, msg });
+            await sleep();
+            setNotification(null);
+        }
+    };
+
     const handleFilterChange = (e) => setFilter(e.target.value);
-
     const handleNameChange = (e) => setName(e.target.value);
-
     const handleNumberChange = (e) => setNumber(e.target.value);
 
     const handleFormSubmit = async (event) => {
         event.preventDefault();
-
         try {
             const contactExists = persons.find(
                 (contact) => contact.name.toLowerCase() === name.toLowerCase()
@@ -59,11 +66,18 @@ const App = () => {
             } else {
                 const contact = await api.addContact({ name, number });
                 setPersons([...persons, contact]);
+
+                showNotification(
+                    "success",
+                    `${name} added successfully to your phone book`
+                );
             }
             setName("");
             setNumber("");
         } catch (error) {
-            console.log(error);
+            console.log(error.message);
+
+            showNotification("fail", error.message);
         }
     };
 
@@ -75,15 +89,29 @@ const App = () => {
             );
             setName("");
             setNumber("");
+
+            showNotification("success", `contact deleted successfully`);
         } catch (error) {
             console.log(error);
+
+            showNotification("fail", error.message);
         }
     };
 
     return (
         <div className="border max-w-screen-md mx-auto my-8 p-4 rounded-md shadow-lg min-h-[80vh]">
             <SectionHeader text="Phone Book" />
-
+            {notification && (
+                <p
+                    className={`${
+                        notification?.type === "success"
+                            ? "text-green-600 bg-green-100"
+                            : "text-red-600 bg-red-100"
+                    } capitalize font-bold p-2 rounded-lg text-center`}
+                >
+                    {notification.msg}
+                </p>
+            )}
             <Filter filter={filter} onChange={handleFilterChange} />
 
             <CreateContactForm

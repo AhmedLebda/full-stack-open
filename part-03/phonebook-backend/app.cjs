@@ -2,6 +2,7 @@ const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const errorhandler = require("./middlewares/errorHandler.cjs");
 
 //### Routes
 const persons_routes = require("./routes/persons.cjs");
@@ -35,8 +36,10 @@ app.use("/api/persons", persons_routes);
 
 // Unknown endpoint
 app.use((req, res) => {
-    res.sendStatus(404);
+    res.status(404).json({ error: "unknown endpoint" });
 });
+
+app.use(errorhandler);
 
 async function main() {
     const url = process.env.DB_CONNECTION;
