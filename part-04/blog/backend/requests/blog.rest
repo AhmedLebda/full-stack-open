@@ -1,0 +1,14 @@
+#! Get all blogs
+GET http://localhost:3000/api/blogs
+
+###
+#! Create a new blog
+POST http://localhost:3000/api/blogs HTTP/1.1
+Content-Type: application/json
+
+{
+    "title": "first blog",
+    "author": "john doe",
+    "url": "https://www.johndoe.com",
+    "likes": 105
+}
