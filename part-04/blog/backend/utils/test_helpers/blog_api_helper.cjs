@@ -5,4 +5,16 @@ const blogsInDb = async () => {
     return blogs.map((blog) => blog.toJSON());
 };
 
-module.exports = { blogsInDb };
+const nonExistingId = async () => {
+    const blog = new Blog({
+        title: "mood saw",
+        author: "Christian Floyd",
+        url: "http://rugul.mh/joig",
+    });
+    await blog.save();
+    await blog.deleteOne();
+
+    return blog._id.toString();
+};
+
+module.exports = { blogsInDb, nonExistingId };
