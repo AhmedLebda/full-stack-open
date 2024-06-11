@@ -1,6 +1,6 @@
 const { test, describe } = require("node:test");
 const assert = require("node:assert");
-const listHelper = require("../utils/list_helper.cjs");
+const listHelper = require("../utils/test_helpers/blog_helper.cjs");
 const blogsData = require("./blogsData.cjs");
 
 describe("Total Likes", () => {

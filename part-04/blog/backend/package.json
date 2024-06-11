@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "node --env-file=.env --watch ./app.cjs",
-    "start": "node ./app.cjs",
-    "build:ui": "rm -rf public && cd ../frontend && npm run build && cp -r dist ../backend/public",
-    "test": "node --test"
+    "dev": "cross-env NODE_ENV=development node --env-file=.env --watch ./index.cjs",
+    "start": "cross-env NODE_ENV=production node ./index.cjs",
+    "test": "cross-env NODE_ENV=test node --env-file=.env --test",
+    "build:ui": "rm -rf public && cd ../frontend && npm run build && cp -r dist ../backend/public"
   },
   "keywords": [],
   "author": "",
@@ -14,8 +14,13 @@
   "description": "",
   "dependencies": {
     "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
     "express": "^4.19.2",
+    "express-async-errors": "^3.1.1",
     "mongoose": "^8.4.1",
     "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "supertest": "^7.0.0"
   }
 }
