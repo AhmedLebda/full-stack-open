@@ -1,4 +1,5 @@
 const Blog = require("../../models/blog.cjs");
+const User = require("../../models/user.cjs");
 
 const blogsInDb = async () => {
     const blogs = await Blog.find({});
@@ -8,13 +9,17 @@ const blogsInDb = async () => {
 const nonExistingId = async () => {
     const blog = new Blog({
         title: "mood saw",
-        author: "Christian Floyd",
+        user: "6669cc536a0fc550bda2de5c",
         url: "http://rugul.mh/joig",
     });
     await blog.save();
     await blog.deleteOne();
-
     return blog._id.toString();
 };
 
-module.exports = { blogsInDb, nonExistingId };
+const usersInDb = async () => {
+    const users = await User.find({});
+    return users.map((user) => user.toJSON());
+};
+
+module.exports = { blogsInDb, nonExistingId, usersInDb };

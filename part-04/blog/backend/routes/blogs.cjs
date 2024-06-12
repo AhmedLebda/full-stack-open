@@ -1,12 +1,15 @@
 const express = require("express");
 const router = express.Router();
 const blogController = require("../controllers/blog.cjs");
+const requireAccess = require("../utils/middlewares/auth/requireAccess.cjs");
 
 router.get("/", blogController.blogs_list);
 
-router.post("/", blogController.blog_create);
-
 router.get("/:id", blogController.blog_detail);
+
+router.use(requireAccess);
+
+router.post("/", blogController.blog_create);
 
 router.delete("/:id", blogController.blog_delete);
 

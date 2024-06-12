@@ -50,17 +50,17 @@ describe("api responds correctly", () => {
     test("Blog without likes specified will default to 0", async () => {
         const blog = {
             title: "result sense",
-            author: "Gregory Ward",
+            userId: "6669cc536a0fc550bda2de5c",
             url: "http://zun.nr/kilwogsez",
         };
-        await api
+
+        const response = await api
             .post("/api/blogs")
             .send(blog)
             .expect(201)
             .expect("Content-Type", /json/);
-        const blogsInDb = await blogApiHelper.blogsInDb();
-        const createdBlog = blogsInDb[blogsInDb.length - 1];
-        assert.strictEqual(createdBlog.likes, 0);
+
+        assert.strictEqual(response.body.likes, 0);
     });
 });
 
@@ -68,7 +68,7 @@ describe("posts are created correctly", () => {
     test("A valid blog can be added to db", async () => {
         const blog = {
             title: "result sense",
-            author: "Gregory Ward",
+            userId: "6669cc536a0fc550bda2de5c",
             url: "http://zun.nr/kilwogsez",
             likes: 110,
         };
@@ -92,10 +92,12 @@ describe("posts are created correctly", () => {
 });
 
 describe("Post Delete", () => {
-    test("succeeds with status code 204 if id is valid", async () => {
+    test("succeeds with status code 200 if id is valid", async () => {
         const initialPosts = await blogApiHelper.blogsInDb();
+
         const firstPost = initialPosts[0];
-        await api.delete(`/api/blogs/${firstPost.id}`).expect(204);
+
+        await api.delete(`/api/blogs/${firstPost.id}`).expect(200);
 
         const postsAfterDeletion = await blogApiHelper.blogsInDb();
         assert.strictEqual(postsAfterDeletion.length, initialPosts.length - 1);
@@ -105,9 +107,13 @@ describe("Post Delete", () => {
         const initialPosts = await blogApiHelper.blogsInDb();
 
         const invalidId = await blogApiHelper.nonExistingId();
+
+        console.log(invalidId);
+
         await api.delete(`/api/blogs/${invalidId}`).expect(400);
 
         const postsAfterDeletion = await blogApiHelper.blogsInDb();
+
         assert.strictEqual(postsAfterDeletion.length, initialPosts.length);
     });
 });

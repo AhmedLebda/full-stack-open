@@ -17,6 +17,16 @@ const errorhandler = (error, req, res, next) => {
             .json({ error: error.errors[Object.keys(error.errors)].message });
     }
 
+    if (error.name === "MongoServerError" && error.code === 11000) {
+        return res.status(400).json({ error: "Username already exists" });
+    }
+    if (error.name === "JsonWebTokenError") {
+        return res.status(401).json({ error: "Invalid token" });
+    }
+    if (error.name === "TokenExpiredError") {
+        return res.status(401).json({ error: "Token expired" });
+    }
+
     next(error);
 };
 

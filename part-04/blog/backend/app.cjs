@@ -6,6 +6,7 @@ const errorHandler = require("./utils/middlewares/errorHandler.cjs");
 const dbConnection = require("./dbConnection.cjs");
 
 const blogRoutes = require("./routes/blogs.cjs");
+const usersRoutes = require("./routes/users.cjs");
 
 const app = express();
 
@@ -19,6 +20,7 @@ dbConnection();
 
 // ### Routes ### //
 app.use("/api/blogs", blogRoutes);
+app.use("/api/users", usersRoutes);
 
 // Unknown endpoint
 app.use((req, res) => {
