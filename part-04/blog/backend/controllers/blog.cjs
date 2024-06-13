@@ -34,27 +34,43 @@ const blog_detail = async (req, res) => {
 };
 
 const blog_delete = async (req, res) => {
-    const deletedBlog = await Blog.findByIdAndDelete(req.params.id);
+    const blog = await Blog.findById(req.params.id);
 
-    if (!deletedBlog) {
-        throw Error("This post is already deleted");
+    if (!blog) {
+        return res.status(404).json({ error: "Blog not found" });
     }
 
-    res.status(200).json(deletedBlog);
+    if (blog.user.toJSON() === req.userId) {
+        await blog.deleteOne();
+        res.status(200).json(blog);
+    } else {
+        res.status(401).json({ error: "only author can delete this blog" });
+    }
 };
 
 const blog_update = async (req, res) => {
-    const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, req.body, {
-        new: true,
-        runValidators: true,
-        context: "query",
-    });
+    const { title, likes } = req.body;
 
-    if (!updatedBlog) {
-        throw Error("This post doesn't exist");
+    const blog = await Blog.findById(req.params.id);
+
+    if (!blog) {
+        return res.status(404).json({ error: "Blog not found" });
     }
 
-    res.status(204).json(updatedBlog);
+    if (blog.user.toJSON() === req.userId) {
+        const updatedBlog = await Blog.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            {
+                new: true,
+                runValidators: true,
+                context: "query",
+            }
+        );
+        res.status(200).json(updatedBlog);
+    } else {
+        res.status(401).json({ error: "only author can update this blog" });
+    }
 };
 
 module.exports = {

@@ -4,20 +4,52 @@ const mongoose = require("mongoose");
 const supertest = require("supertest");
 const app = require("../app.cjs");
 const Blog = require("../models/blog.cjs");
+const User = require("../models/user.cjs");
 const { listWithSeveralBlogs } = require("./blogsData.cjs");
 const blogApiHelper = require("../utils/test_helpers/blog_api_helper.cjs");
-
+const bcrypt = require("bcrypt");
 const api = supertest(app);
+const authHelper = require("../utils/auth_helper.cjs");
+
+// Just a different color to make my console logs more clear ini the terminal
+const LOG_COLOR = "\x1b[35m";
+
+// Access Token
+let token = null;
+let createdUserId = null;
 
 // ## Reset the db before every test ## //
 beforeEach(async () => {
-    console.log("resetting db...");
+    console.log(LOG_COLOR, "############################################");
+    console.log(LOG_COLOR, "=====> resetting db...");
+
+    console.log(LOG_COLOR, "=====> Resetting Users collection");
+    await User.deleteMany({});
+    const user = new User({
+        username: "root",
+        password: "UA0FYIgXIYSp2K",
+        name: "super user",
+    });
+    user.password = await bcrypt.hash(user.password, 10);
+    const createdUser = await user.save();
+    createdUserId = createdUser._id;
+    console.log(LOG_COLOR, `=====>user ${user.name} is created!`);
+
+    console.log(LOG_COLOR, "=====> Logging in.... (creating access token)");
+    const access_token = authHelper.createAccessToken({
+        username: createdUser.username,
+        id: createdUser._id,
+    });
+    token = access_token;
+
+    console.log(LOG_COLOR, "=====> Resetting Blogs collection");
     await Blog.deleteMany({});
     const blogPromises = listWithSeveralBlogs.map((blog) => {
-        const createdBlog = new Blog(blog);
+        const createdBlog = new Blog({ ...blog, user: createdUserId });
         return createdBlog.save();
     });
     await Promise.all(blogPromises);
+    console.log(LOG_COLOR, "############################################");
 });
 
 describe("api responds correctly", () => {
@@ -46,48 +78,69 @@ describe("api responds correctly", () => {
             assert(Object.keys(blog).includes("id"));
         });
     });
-
-    test("Blog without likes specified will default to 0", async () => {
-        const blog = {
-            title: "result sense",
-            userId: "6669cc536a0fc550bda2de5c",
-            url: "http://zun.nr/kilwogsez",
-        };
-
-        const response = await api
-            .post("/api/blogs")
-            .send(blog)
-            .expect(201)
-            .expect("Content-Type", /json/);
-
-        assert.strictEqual(response.body.likes, 0);
-    });
 });
 
 describe("posts are created correctly", () => {
     test("A valid blog can be added to db", async () => {
         const blog = {
             title: "result sense",
-            userId: "6669cc536a0fc550bda2de5c",
             url: "http://zun.nr/kilwogsez",
             likes: 110,
         };
         await api
             .post("/api/blogs")
             .send(blog)
+            .set({ Authorization: `Bearer ${token}` })
             .expect(201)
             .expect("Content-Type", /json/);
         const blogsInDb = await blogApiHelper.blogsInDb();
         assert.strictEqual(blogsInDb.length, listWithSeveralBlogs.length + 1);
     });
 
-    test("Invalid blog can't be added to db", async () => {
+    test("Invalid blog data can't be added to db", async () => {
         const blog = {};
-        await api.post("/api/blogs").send(blog).expect(400);
+        await api
+            .post("/api/blogs")
+            .send(blog)
+            .set({ Authorization: `Bearer ${token}` })
+            .expect(400);
 
         const blogsInDb = await blogApiHelper.blogsInDb();
 
         assert.strictEqual(blogsInDb.length, listWithSeveralBlogs.length);
+    });
+
+    test("Can't create a post with Invalid token", async () => {
+        const blog = {
+            title: "result sense",
+            url: "http://zun.nr/kilwogsez",
+        };
+
+        await api
+            .post("/api/blogs")
+            .send(blog)
+            .set({ Authorization: `Bearer invalidToken` })
+            .expect(401);
+
+        const blogsInDb = await blogApiHelper.blogsInDb();
+
+        assert.strictEqual(blogsInDb.length, listWithSeveralBlogs.length);
+    });
+
+    test("Blog without likes specified will default to 0", async () => {
+        const blog = {
+            title: "result sense",
+            url: "http://zun.nr/kilwogsez",
+        };
+
+        const response = await api
+            .post("/api/blogs")
+            .send(blog)
+            .set({ Authorization: `Bearer ${token}` })
+            .expect(201)
+            .expect("Content-Type", /json/);
+
+        assert.strictEqual(response.body.likes, 0);
     });
 });
 
@@ -97,7 +150,10 @@ describe("Post Delete", () => {
 
         const firstPost = initialPosts[0];
 
-        await api.delete(`/api/blogs/${firstPost.id}`).expect(200);
+        await api
+            .delete(`/api/blogs/${firstPost.id}`)
+            .set({ Authorization: `Bearer ${token}` })
+            .expect(200);
 
         const postsAfterDeletion = await blogApiHelper.blogsInDb();
         assert.strictEqual(postsAfterDeletion.length, initialPosts.length - 1);
@@ -110,7 +166,10 @@ describe("Post Delete", () => {
 
         console.log(invalidId);
 
-        await api.delete(`/api/blogs/${invalidId}`).expect(400);
+        await api
+            .delete(`/api/blogs/${invalidId}`)
+            .set({ Authorization: `Bearer ${token}` })
+            .expect(404);
 
         const postsAfterDeletion = await blogApiHelper.blogsInDb();
 
@@ -119,15 +178,16 @@ describe("Post Delete", () => {
 });
 
 describe("Post Update", async () => {
-    test("succeeds with status code 204 if id is valid", async () => {
+    test("succeeds with status code 200 if id is valid", async () => {
         const initialPosts = await blogApiHelper.blogsInDb();
         const firstPost = initialPosts[0];
         firstPost.likes = 1010;
 
-        const response = await api
+        await api
             .put(`/api/blogs/${firstPost.id}`)
+            .set({ Authorization: `Bearer ${token}` })
             .send(firstPost)
-            .expect(204);
+            .expect(200);
         const postsAfterUpdate = await blogApiHelper.blogsInDb();
         const firstPostAfterUpdate = postsAfterUpdate[0];
 

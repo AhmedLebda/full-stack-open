@@ -6,29 +6,30 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ildhb
 #! Create a new blog
 POST http://localhost:3000/api/blogs HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IldhbHRlciIsImlkIjoiNjY2OWY1OWEyODA3MTg4YzczZGIzM2QyIiwiaWF0IjoxNzE4Mjg1NjQwLCJleHAiOjE3MTgyODY1NDB9.iPnzwby9hhDl_CAa5K2cIJ6jBj8-r6WlgGYR0WA1vWw
 
 {
-    "title": "press coming",
-    "url": "http://hewa.tn/ozfajin",
-    "userId": "666999f17e653c2edd123e28"
+    "title": "map bite",
+    "url": "http://riop.sb/epefubkok"
 }
 ###
 
 #! get a blog detail by id
-GET http://localhost:3000/api/blogs/6669e4bfc580801f6434efad
+GET http://localhost:3000/api/blogs/666af0e3c8d4224bebf56381
 
 ###
 
 #! Delete a blog detail by id
-DELETE http://localhost:3000/api/blogs/6669e6aa2d15bee1747ba586
+DELETE http://localhost:3000/api/blogs/666af5626e1bd7d055ff285c
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IldhbHRlciIsImlkIjoiNjY2OWY1OWEyODA3MTg4YzczZGIzM2QyIiwiaWF0IjoxNzE4Mjg1NjQwLCJleHAiOjE3MTgyODY1NDB9.iPnzwby9hhDl_CAa5K2cIJ6jBj8-r6WlgGYR0WA1vWw
 
 ###
 #! Update a blog by id
-PUT http://localhost:3000/api/blogs/66672bded53ed60e496deb89 HTTP/1.1
+PUT http://localhost:3000/api/blogs/666af5626e1bd7d055ff285c HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IldhbHRlciIsImlkIjoiNjY2OWY1OWEyODA3MTg4YzczZGIzM2QyIiwiaWF0IjoxNzE4Mjg1NjQwLCJleHAiOjE3MTgyODY1NDB9.iPnzwby9hhDl_CAa5K2cIJ6jBj8-r6WlgGYR0WA1vWw
 
 {
-    "title": "scientific winter",
-    "user": "",
-    "url": "http://vobabodog.jm/jiru"
+    "title": "This is the updated blog title",
+    "likes": -1
 }

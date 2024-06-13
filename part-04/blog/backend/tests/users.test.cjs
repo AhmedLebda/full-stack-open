@@ -5,6 +5,7 @@ const supertest = require("supertest");
 const app = require("../app.cjs");
 const User = require("../models/user.cjs");
 const helper = require("../utils/test_helpers/blog_api_helper.cjs");
+const bcrypt = require("bcrypt");
 
 const api = supertest(app);
 
@@ -17,6 +18,7 @@ beforeEach(async () => {
         password: "UA0FYIgXIYSp2K",
         name: "super user",
     });
+    user.password = await bcrypt.hash(user.password, 10);
     await user.save();
 
     console.log(`user ${user.name} is created!`);
@@ -85,6 +87,31 @@ describe("User Creation", () => {
         const updatedUsers = await helper.usersInDb();
 
         assert.strictEqual(updatedUsers.length, initialUsers.length);
+    });
+});
+
+describe("user Login", () => {
+    test("Login: Successfully with valid credentials", async () => {
+        const userData = { username: "root", password: "UA0FYIgXIYSp2K" };
+
+        const res = await api
+            .post("/api/users/login")
+            .send(userData)
+            .expect(200)
+            .expect("Content-Type", /json/);
+
+        assert(Object.keys(res.body).includes("access_token"));
+    });
+
+    test("Login: Fail with invalid credentials", async () => {
+        const userData = { username: "root", password: "UA0" };
+        const res = await api
+            .post("/api/users/login")
+            .send(userData)
+            .expect(400)
+            .expect("Content-Type", /json/);
+
+        assert(Object.keys(res.body).includes("error"));
     });
 });
 
