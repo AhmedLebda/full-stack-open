@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 // ==> Components
-import SectionHeader from "./components/SectionHeader";
 import LoginForm from "./components/LoginForm";
 import Blogs from "./components/Blogs";
+import CreateBlogForm from "./components/CreateBlogForm";
 // ==> API
 import authApi from "./api/auth";
 import blogApi from "./api/blog";
 // ===> Utilities
 import { sleep } from "./utils";
+import Header from "./components/Header";
 
 const App = () => {
     const [user, setUser] = useState(null);
@@ -17,6 +18,11 @@ const App = () => {
         password: "",
     });
     const [notification, setNotification] = useState(null);
+    const [createBlogData, setCreateBlogData] = useState({
+        title: "",
+        url: "",
+    });
+    const [isCreate, setIsCreate] = useState(false);
 
     useEffect(() => {
         const storedUser = localStorage.getItem("user");
@@ -73,52 +79,78 @@ const App = () => {
         }
     };
 
+    const handleCreateBlogDataChange = (e) => {
+        setCreateBlogData((prevFormData) => ({
+            ...prevFormData,
+            [e.target.name]: e.target.value,
+        }));
+    };
+
+    const handleCreateBlogSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const createdBlog = await blogApi.createBlog(
+                user.access_token,
+                createBlogData
+            );
+            setBlogs([...blogs, createdBlog]);
+            setCreateBlogData((prevData) => ({ title: "", url: "" }));
+            setIsCreate(false);
+            showNotification("success", "A new blog has been added");
+        } catch (error) {
+            console.log(error.message);
+            showNotification("error", error.message);
+        }
+    };
+
     const handleLogout = () => {
         localStorage.removeItem("user");
         setUser(null);
     };
 
+    const toggleIsCreate = () => {
+        setIsCreate(!isCreate);
+    };
     return (
-        <div className="border max-w-screen-md mx-auto my-8 p-4 rounded-md shadow-lg min-h-[80vh]">
-            <SectionHeader text="Pharaoh's Papyrus" />
-
-            {notification && (
-                <p
-                    className={`${
-                        notification?.type === "success"
-                            ? "text-green-600 bg-green-100"
-                            : "text-red-600 bg-red-100"
-                    } capitalize font-bold p-2 rounded-lg text-center`}
-                >
-                    {notification.msg}
-                </p>
-            )}
-            {!user && (
-                <LoginForm
-                    loginData={credentials}
-                    onDataChange={handleCredentialsChange}
-                    onSubmit={handleLoginFormSubmit}
-                />
-            )}
-
-            {user && (
-                <div className="mt-4">
-                    <div className="flex justify-between items-center">
-                        <p className="font-bold text-xl">
-                            Welcome{" "}
-                            <span className="text-blue-900">{user.name}</span>
-                        </p>
-                        <button
-                            className="bg-red-600 hover:bg-red-650 rounded-md px-6 py-2 font-bold capitalize text-white"
-                            onClick={handleLogout}
-                        >
-                            Logout
-                        </button>
-                    </div>
-                    <Blogs blogsData={blogs} />
-                </div>
-            )}
-        </div>
+        <>
+            <Header
+                fullName={user?.name}
+                onLogout={handleLogout}
+                onCreate={toggleIsCreate}
+            />
+            <div className="border max-w-screen-md mx-auto my-8 p-4 rounded-md shadow-lg min-h-[80vh]">
+                {notification && (
+                    <p
+                        className={`${
+                            notification?.type === "success"
+                                ? "text-green-600 bg-green-100"
+                                : "text-red-600 bg-red-100"
+                        } capitalize font-bold p-2 rounded-lg text-center`}
+                    >
+                        {notification.msg}
+                    </p>
+                )}
+                {!user && (
+                    <LoginForm
+                        loginData={credentials}
+                        onDataChange={handleCredentialsChange}
+                        onSubmit={handleLoginFormSubmit}
+                    />
+                )}
+                {user && (
+                    <>
+                        {isCreate && (
+                            <CreateBlogForm
+                                data={createBlogData}
+                                onDataChange={handleCreateBlogDataChange}
+                                onSubmit={handleCreateBlogSubmit}
+                            />
+                        )}
+                        <Blogs blogsData={blogs} />
+                    </>
+                )}
+            </div>
+        </>
     );
 };
 

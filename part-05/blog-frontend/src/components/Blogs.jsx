@@ -9,7 +9,7 @@ const Blogs = ({ blogsData }) => {
                 <div
                     key={blog.id}
                     id={blog.id}
-                    className="p-4 border-l-4 border-blue-900 mb-2 rounded-md shadow-md"
+                    className="p-4 border-l-4 border-blue-900 mb-4 rounded-md shadow-md"
                 >
                     <p className="capitalize font-bold text-2xl text-slate-800 mb-4">
                         {blog.title}

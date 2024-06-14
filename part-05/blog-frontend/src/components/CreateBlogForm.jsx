@@ -1,42 +1,43 @@
 import OptionButton from "./OptionButton";
 
-const LoginForm = ({ loginData, onDataChange, onSubmit }) => {
+const CreateBlogForm = ({ onDataChange, onSubmit, data }) => {
     return (
         <form className=" mb-6 pb-6 border-b-2 " onSubmit={onSubmit}>
             <h1 className="italic font-serif font-bold text-4xl text-blue-900 p-4">
-                Login:
+                Create a blog:
             </h1>
+
             <div className="p-4 capitalize">
-                <label htmlFor="username">username:</label>
+                <label htmlFor="title">Title:</label>
                 <input
                     required
                     type="text"
-                    name="username"
-                    id="username"
+                    name="title"
+                    id="title"
                     className="border ml-4 px-2"
-                    value={loginData.username}
+                    value={data.title}
                     onChange={onDataChange}
                 />
             </div>
 
             <div className="p-4 capitalize">
-                <label htmlFor="password">password:</label>
+                <label htmlFor="url">URL:</label>
                 <input
                     required
-                    type="password"
-                    name="password"
-                    id="password"
+                    type="text"
+                    name="url"
+                    id="url"
                     className="border ml-4 px-2"
-                    value={loginData.password}
+                    value={data.url}
                     onChange={onDataChange}
                 />
             </div>
 
             <div className="p-4">
-                <OptionButton text="Login" />
+                <OptionButton text="Create" />
             </div>
         </form>
     );
 };
 
-export default LoginForm;
+export default CreateBlogForm;
