@@ -1,8 +1,27 @@
 import OptionButton from "./OptionButton";
+import { useState } from "react";
 
-const CreateBlogForm = ({ onDataChange, onSubmit, data }) => {
+const CreateBlogForm = ({ createBlog }) => {
+    const [createBlogData, setCreateBlogData] = useState({
+        title: "",
+        url: "",
+    });
+
+    const handleChange = (e) => {
+        setCreateBlogData((prevFormData) => ({
+            ...prevFormData,
+            [e.target.name]: e.target.value,
+        }));
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        createBlog(createBlogData);
+    };
+
     return (
-        <form className=" mb-6 pb-6 border-b-2 " onSubmit={onSubmit}>
+        <form className=" mb-6 pb-6 border-b-2 " onSubmit={handleSubmit}>
             <h1 className="italic font-serif font-bold text-4xl text-blue-900 p-4">
                 Create a blog:
             </h1>
@@ -15,8 +34,8 @@ const CreateBlogForm = ({ onDataChange, onSubmit, data }) => {
                     name="title"
                     id="title"
                     className="border ml-4 px-2"
-                    value={data.title}
-                    onChange={onDataChange}
+                    value={createBlogData.title}
+                    onChange={handleChange}
                 />
             </div>
 
@@ -28,8 +47,8 @@ const CreateBlogForm = ({ onDataChange, onSubmit, data }) => {
                     name="url"
                     id="url"
                     className="border ml-4 px-2"
-                    value={data.url}
-                    onChange={onDataChange}
+                    value={createBlogData.url}
+                    onChange={handleChange}
                 />
             </div>
 

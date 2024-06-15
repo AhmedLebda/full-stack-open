@@ -1,8 +1,27 @@
 import OptionButton from "./OptionButton";
+import { useState } from "react";
+const LoginForm = ({ login }) => {
+    const [credentials, setCredentials] = useState({
+        username: "",
+        password: "",
+    });
+    const handleChange = (e) => {
+        setCredentials((prevCredentials) => ({
+            ...prevCredentials,
+            [e.target.name]: e.target.value,
+        }));
+    };
 
-const LoginForm = ({ loginData, onDataChange, onSubmit }) => {
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        const { username, password } = credentials;
+
+        login(username, password);
+    };
+
     return (
-        <form className=" mb-6 pb-6 border-b-2 " onSubmit={onSubmit}>
+        <form className=" mb-6 pb-6 border-b-2 " onSubmit={handleSubmit}>
             <h1 className="italic font-serif font-bold text-4xl text-blue-900 p-4">
                 Login:
             </h1>
@@ -14,8 +33,8 @@ const LoginForm = ({ loginData, onDataChange, onSubmit }) => {
                     name="username"
                     id="username"
                     className="border ml-4 px-2"
-                    value={loginData.username}
-                    onChange={onDataChange}
+                    value={credentials.username}
+                    onChange={handleChange}
                 />
             </div>
 
@@ -27,8 +46,8 @@ const LoginForm = ({ loginData, onDataChange, onSubmit }) => {
                     name="password"
                     id="password"
                     className="border ml-4 px-2"
-                    value={loginData.password}
-                    onChange={onDataChange}
+                    value={credentials.password}
+                    onChange={handleChange}
                 />
             </div>
 

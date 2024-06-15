@@ -10,7 +10,7 @@ const generateHashedPassword = async (password) => {
 
 const createAccessToken = (payload) => {
     return jwt.sign(payload, config.ACCESS_TOKEN_SECRET, {
-        expiresIn: "15min",
+        expiresIn: "1h",
     });
 };
 

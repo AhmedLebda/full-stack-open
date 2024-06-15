@@ -39,4 +39,43 @@ const createBlog = async (token, blogData) => {
     return data;
 };
 
-export default { getAllBlogs, createBlog };
+const likeBlog = async (token, blog) => {
+    const { id, likes } = blog;
+    const response = await fetch(`${baseUrl}/blogs/${id}`, {
+        method: "PUT",
+        mode: "cors",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw Error(data.error);
+    }
+
+    return data;
+};
+
+const deleteBlog = async (token, blogId) => {
+    const response = await fetch(`${baseUrl}/blogs/${blogId}`, {
+        method: "DELETE",
+        mode: "cors",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw Error(data.error);
+    }
+
+    return data;
+};
+
+export default { getAllBlogs, createBlog, likeBlog, deleteBlog };

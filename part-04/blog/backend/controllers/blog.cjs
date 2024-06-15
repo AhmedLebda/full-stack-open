@@ -16,17 +16,27 @@ const blog_create = async (req, res) => {
 
     const blog = new Blog({ title, url, user: userId });
 
-    const createdBlog = await blog.save();
+    const savedBlog = await blog.save();
 
-    const user = await User.findByIdAndUpdate(userId, {
-        $push: { posts: createdBlog._id },
+    const createdBlog = await Blog.findById(savedBlog._id).populate("user", {
+        password: 0,
+        posts: 0,
+        __v: 0,
     });
 
-    res.status(201).json(blog);
+    await User.findByIdAndUpdate(userId, {
+        $push: { posts: savedBlog._id },
+    });
+
+    res.status(201).json(createdBlog);
 };
 
 const blog_detail = async (req, res) => {
-    const blog = await Blog.findById(req.params.id);
+    const blog = await Blog.findById(req.params.id).populate("user", {
+        password: 0,
+        posts: 0,
+        __v: 0,
+    });
     if (!blog) {
         throw Error("This blog doesn't exist");
     }
@@ -49,7 +59,7 @@ const blog_delete = async (req, res) => {
 };
 
 const blog_update = async (req, res) => {
-    const { title, likes } = req.body;
+    const { title } = req.body;
 
     const blog = await Blog.findById(req.params.id);
 
@@ -60,16 +70,33 @@ const blog_update = async (req, res) => {
     if (blog.user.toJSON() === req.userId) {
         const updatedBlog = await Blog.findByIdAndUpdate(
             req.params.id,
-            req.body,
+            { title, $inc: { likes: 1 } },
             {
                 new: true,
                 runValidators: true,
                 context: "query",
             }
-        );
+        ).populate("user", {
+            password: 0,
+            posts: 0,
+            __v: 0,
+        });
         res.status(200).json(updatedBlog);
     } else {
-        res.status(401).json({ error: "only author can update this blog" });
+        const updatedBlog = await Blog.findByIdAndUpdate(
+            req.params.id,
+            { $inc: { likes: 1 } },
+            {
+                new: true,
+                runValidators: true,
+                context: "query",
+            }
+        ).populate("user", {
+            password: 0,
+            posts: 0,
+            __v: 0,
+        });
+        res.status(200).json(updatedBlog);
     }
 };
 

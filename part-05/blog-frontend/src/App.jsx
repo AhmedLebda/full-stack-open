@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import LoginForm from "./components/LoginForm";
 import Blogs from "./components/Blogs";
 import CreateBlogForm from "./components/CreateBlogForm";
+import Notification from "./components/Notification";
 // ==> API
 import authApi from "./api/auth";
 import blogApi from "./api/blog";
@@ -13,17 +14,10 @@ import Header from "./components/Header";
 const App = () => {
     const [user, setUser] = useState(null);
     const [blogs, setBlogs] = useState(null);
-    const [credentials, setCredentials] = useState({
-        username: "",
-        password: "",
-    });
     const [notification, setNotification] = useState(null);
-    const [createBlogData, setCreateBlogData] = useState({
-        title: "",
-        url: "",
-    });
     const [isCreate, setIsCreate] = useState(false);
 
+    // Get user data from local storage when app loads for the first time
     useEffect(() => {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
@@ -31,6 +25,7 @@ const App = () => {
         }
     }, []);
 
+    // fetch all blogs from api
     useEffect(() => {
         const getBlogs = async () => {
             if (user) {
@@ -49,6 +44,7 @@ const App = () => {
         getBlogs();
     }, [user]);
 
+    // Show notification on user action
     const showNotification = async (type, msg) => {
         if (!notification) {
             setNotification({ type, msg });
@@ -57,21 +53,12 @@ const App = () => {
         }
     };
 
-    const handleCredentialsChange = (e) => {
-        setCredentials((prevCredentials) => ({
-            ...prevCredentials,
-            [e.target.name]: e.target.value,
-        }));
-    };
-
-    const handleLoginFormSubmit = async (e) => {
-        e.preventDefault();
-
-        const { username, password } = credentials;
+    const login = async (username, password) => {
         try {
             const userData = await authApi.login(username, password);
 
             setUser(userData);
+
             localStorage.setItem("user", JSON.stringify(userData));
         } catch (error) {
             console.log(error.message);
@@ -79,24 +66,48 @@ const App = () => {
         }
     };
 
-    const handleCreateBlogDataChange = (e) => {
-        setCreateBlogData((prevFormData) => ({
-            ...prevFormData,
-            [e.target.name]: e.target.value,
-        }));
-    };
-
-    const handleCreateBlogSubmit = async (e) => {
-        e.preventDefault();
+    const createBlog = async (blog) => {
         try {
             const createdBlog = await blogApi.createBlog(
                 user.access_token,
-                createBlogData
+                blog
             );
             setBlogs([...blogs, createdBlog]);
-            setCreateBlogData((prevData) => ({ title: "", url: "" }));
             setIsCreate(false);
             showNotification("success", "A new blog has been added");
+        } catch (error) {
+            console.log(error.message);
+            showNotification("error", error.message);
+        }
+    };
+
+    const handleBlogLike = async (blog) => {
+        try {
+            const updatedBlog = await blogApi.likeBlog(user.access_token, blog);
+
+            setBlogs(
+                blogs.map((blog) =>
+                    blog.id === updatedBlog.id ? updatedBlog : blog
+                )
+            );
+
+            showNotification("success", "You liked a blog");
+        } catch (error) {
+            console.log(error.message);
+            showNotification("error", error.message);
+        }
+    };
+
+    const handleBlogDelete = async (blogId) => {
+        try {
+            const deletedBlog = await blogApi.deleteBlog(
+                user.access_token,
+                blogId
+            );
+
+            setBlogs(blogs.filter((blog) => blog.id !== deletedBlog.id));
+
+            showNotification("success", "You Deleted a blog");
         } catch (error) {
             console.log(error.message);
             showNotification("error", error.message);
@@ -108,9 +119,11 @@ const App = () => {
         setUser(null);
     };
 
+    // Toggle the blog create form
     const toggleIsCreate = () => {
         setIsCreate(!isCreate);
     };
+
     return (
         <>
             <Header
@@ -118,38 +131,25 @@ const App = () => {
                 onLogout={handleLogout}
                 onCreate={toggleIsCreate}
             />
-            <div className="border max-w-screen-md mx-auto my-8 p-4 rounded-md shadow-lg min-h-[80vh]">
-                {notification && (
-                    <p
-                        className={`${
-                            notification?.type === "success"
-                                ? "text-green-600 bg-green-100"
-                                : "text-red-600 bg-red-100"
-                        } capitalize font-bold p-2 rounded-lg text-center`}
-                    >
-                        {notification.msg}
-                    </p>
-                )}
-                {!user && (
-                    <LoginForm
-                        loginData={credentials}
-                        onDataChange={handleCredentialsChange}
-                        onSubmit={handleLoginFormSubmit}
-                    />
-                )}
+
+            <main className="border max-w-screen-md mx-auto my-8 p-4 rounded-md shadow-lg min-h-[80vh]">
+                {notification && <Notification notification={notification} />}
+
+                {!user && <LoginForm login={login} />}
+
                 {user && (
                     <>
-                        {isCreate && (
-                            <CreateBlogForm
-                                data={createBlogData}
-                                onDataChange={handleCreateBlogDataChange}
-                                onSubmit={handleCreateBlogSubmit}
-                            />
-                        )}
-                        <Blogs blogsData={blogs} />
+                        {isCreate && <CreateBlogForm createBlog={createBlog} />}
+
+                        <Blogs
+                            blogsData={blogs}
+                            author={user.name}
+                            onBlogLike={handleBlogLike}
+                            onBlogDelete={handleBlogDelete}
+                        />
                     </>
                 )}
-            </div>
+            </main>
         </>
     );
 };
