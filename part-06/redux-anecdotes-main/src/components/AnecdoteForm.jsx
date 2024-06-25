@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { addNote } from "../reducers/anecdoteReducer";
+import {
+    setNotification,
+    removeNotification,
+} from "../reducers/notificationReducer";
 
 const AnecdoteForm = () => {
     const [note, setNote] = useState("");
@@ -11,6 +15,10 @@ const AnecdoteForm = () => {
 
         dispatch(addNote(note));
         setNote("");
+        dispatch(setNotification("Note created successfully!"));
+        setTimeout(() => {
+            dispatch(removeNotification());
+        }, 2000);
     };
     return (
         <>
