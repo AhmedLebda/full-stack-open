@@ -10,10 +10,21 @@ const AnecdoteForm = () => {
     const [note, setNote] = useState("");
     const dispatch = useDispatch();
 
-    const handleNoteAdd = (e) => {
+    const handleNoteAdd = async (e) => {
         e.preventDefault();
 
-        dispatch(addNote(note));
+        const response = await fetch("http://localhost:3001/anecdotes", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ content: note, votes: 0 }),
+        });
+
+        const createdNote = await response.json();
+        console.log(createdNote);
+
+        dispatch(addNote(createdNote));
         setNote("");
         dispatch(setNotification("Note created successfully!"));
         setTimeout(() => {

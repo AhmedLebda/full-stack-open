@@ -16,9 +16,21 @@ const AnecdoteList = () => {
         )
         .sort((a, b) => b.votes - a.votes);
 
-    const handleVote = (id) => {
+    const handleVote = async (id) => {
         console.log("vote", id);
-        dispatch(vote(id));
+
+        const anecdote = anecdotes.find((a) => a.id === id);
+
+        const response = await fetch(`http://localhost:3001/anecdotes/${id}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ votes: anecdote.votes + 1 }),
+        });
+        const updatedAnecdote = await response.json();
+
+        dispatch(vote(updatedAnecdote.id));
         dispatch(setNotification("You voted!"));
         setTimeout(() => {
             dispatch(removeNotification());
