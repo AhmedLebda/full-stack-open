@@ -1,38 +1,19 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const anecdotesAtStart = [
-    "If it hurts, do it more often",
-    "Adding manpower to a late software project makes it later!",
-    "The first 90 percent of the code accounts for the first 90 percent of the development time...The remaining 10 percent of the code accounts for the other 90 percent of the development time.",
-    "Any fool can write code that a computer can understand. Good programmers write code that humans can understand.",
-    "Premature optimization is the root of all evil.",
-    "Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.",
-];
-
-const getId = () => (100000 * Math.random()).toFixed(0);
-
-const asObject = (anecdote) => {
-    return {
-        content: anecdote,
-        id: getId(),
-        votes: 0,
-    };
-};
-
-const initialState = anecdotesAtStart.map(asObject);
+const initialState = [];
 
 const anecdoteSlice = createSlice({
     name: "anecdote",
     initialState,
     reducers: {
-        vote(state, action) {
-            const id = action.payload;
+        updateVote(state, action) {
+            const { id, votes } = action.payload;
             const targetAnecdote = state.find((anecdote) => anecdote.id === id);
-            targetAnecdote.votes = targetAnecdote.votes + 1;
+            targetAnecdote.votes = votes;
         },
-        addNote(state, action) {
-            const note = action.payload;
-            state.push(note);
+        appendAnecdote(state, action) {
+            const anecdote = action.payload;
+            state.push(anecdote);
         },
         setAnecdotes(state, action) {
             return action.payload;
@@ -40,5 +21,53 @@ const anecdoteSlice = createSlice({
     },
 });
 
+// ####################
+// =====> Thunks <=====
+//#####################
+export const initializeAnecdotes = () => async (dispatch) => {
+    try {
+        const response = await fetch("http://localhost:3001/anecdotes");
+        const anecdotes = await response.json();
+        dispatch(setAnecdotes(anecdotes));
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+export const createAnecdote = (content) => async (dispatch) => {
+    try {
+        const response = await fetch("http://localhost:3001/anecdotes", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ content: content, votes: 0 }),
+        });
+        const createdAnecdote = await response.json();
+        dispatch(appendAnecdote(createdAnecdote));
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+export const vote = (id) => async (dispatch, getState) => {
+    try {
+        const { anecdotes } = getState();
+        const anecdote = anecdotes.find((a) => a.id === id);
+        const response = await fetch(`http://localhost:3001/anecdotes/${id}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ votes: anecdote.votes + 1 }),
+        });
+        const updatedAnecdote = await response.json();
+        dispatch(updateVote(updatedAnecdote));
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 export default anecdoteSlice.reducer;
-export const { vote, addNote, setAnecdotes } = anecdoteSlice.actions;
+export const { updateVote, appendAnecdote, setAnecdotes } =
+    anecdoteSlice.actions;

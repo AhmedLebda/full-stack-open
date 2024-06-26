@@ -1,9 +1,6 @@
 import { useSelector, useDispatch } from "react-redux";
 import { vote } from "../reducers/anecdoteReducer";
-import {
-    setNotification,
-    removeNotification,
-} from "../reducers/notificationReducer";
+import { setNotification } from "../reducers/notificationReducer";
 
 const AnecdoteList = () => {
     const anecdotes = useSelector((state) => state.anecdotes);
@@ -19,22 +16,9 @@ const AnecdoteList = () => {
     const handleVote = async (id) => {
         console.log("vote", id);
 
-        const anecdote = anecdotes.find((a) => a.id === id);
+        dispatch(vote(id));
 
-        const response = await fetch(`http://localhost:3001/anecdotes/${id}`, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ votes: anecdote.votes + 1 }),
-        });
-        const updatedAnecdote = await response.json();
-
-        dispatch(vote(updatedAnecdote.id));
-        dispatch(setNotification("You voted!"));
-        setTimeout(() => {
-            dispatch(removeNotification());
-        }, 2000);
+        dispatch(setNotification("You voted!", 2));
     };
 
     return (

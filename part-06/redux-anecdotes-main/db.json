@@ -3,7 +3,7 @@
     {
       "content": "If it hurts, do it more often",
       "id": "47145",
-      "votes": 4
+      "votes": 23
     },
     {
       "content": "Adding manpower to a late software project makes it later!",
@@ -44,6 +44,21 @@
       "id": "f247",
       "content": "test three",
       "votes": 0
+    },
+    {
+      "id": "edf0",
+      "content": "test four after adding thunks",
+      "votes": 0
+    },
+    {
+      "id": "cdac",
+      "content": "tests",
+      "votes": 0
+    },
+    {
+      "id": "f026",
+      "content": "tsts",
+      "votes": 1
     }
   ]
 }
