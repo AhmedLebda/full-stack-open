@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 // ==> Components
+import Header from "./components/Header";
 import LoginForm from "./components/LoginForm";
 import Blogs from "./components/Blogs";
 import CreateBlogForm from "./components/CreateBlogForm";
@@ -7,15 +9,16 @@ import Notification from "./components/Notification";
 // ==> API
 import authApi from "./api/auth";
 import blogApi from "./api/blog";
-// ===> Utilities
-import { sleep } from "./utils";
-import Header from "./components/Header";
+// ===> Redux Actions
+import { showNotification } from "./features/notification/notificationSlice";
 
 const App = () => {
     const [user, setUser] = useState(null);
     const [blogs, setBlogs] = useState(null);
-    const [notification, setNotification] = useState(null);
     const [isCreate, setIsCreate] = useState(false);
+
+    const notification = useSelector((state) => state.notification);
+    const dispatch = useDispatch();
 
     // Get user data from local storage when app loads for the first time
     useEffect(() => {
@@ -36,22 +39,12 @@ const App = () => {
                     setBlogs([...blogsData]);
                 } catch (error) {
                     console.log(error.message);
-                    showNotification("error", error.message);
+                    dispatch(showNotification("error", error.message));
                 }
             }
         };
-
         getBlogs();
     }, [user]);
-
-    // Show notification on user action
-    const showNotification = async (type, msg) => {
-        if (!notification) {
-            setNotification({ type, msg });
-            await sleep();
-            setNotification(null);
-        }
-    };
 
     const login = async (username, password) => {
         try {
@@ -62,7 +55,7 @@ const App = () => {
             localStorage.setItem("user", JSON.stringify(userData));
         } catch (error) {
             console.log(error.message);
-            showNotification("error", error.message);
+            dispatch(showNotification("error", error.message));
         }
     };
 
@@ -74,10 +67,10 @@ const App = () => {
             );
             setBlogs([...blogs, createdBlog]);
             setIsCreate(false);
-            showNotification("success", "A new blog has been added");
+            dispatch(showNotification("success", "A new blog has been added"));
         } catch (error) {
             console.log(error.message);
-            showNotification("error", error.message);
+            dispatch(showNotification("error", error.message));
         }
     };
 
@@ -91,10 +84,10 @@ const App = () => {
                 )
             );
 
-            showNotification("success", "You liked a blog");
+            dispatch(showNotification("success", "Blog Liked"));
         } catch (error) {
             console.log(error.message);
-            showNotification("error", error.message);
+            dispatch(showNotification("error", error.message));
         }
     };
 
@@ -107,10 +100,10 @@ const App = () => {
 
             setBlogs(blogs.filter((blog) => blog.id !== deletedBlog.id));
 
-            showNotification("success", "You Deleted a blog");
+            dispatch(showNotification("success", "Blog Deleted Successfully"));
         } catch (error) {
             console.log(error.message);
-            showNotification("error", error.message);
+            dispatch(showNotification("error", error.message));
         }
     };
 
