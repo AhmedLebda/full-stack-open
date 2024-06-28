@@ -11,12 +11,18 @@ import authApi from "./api/auth";
 import blogApi from "./api/blog";
 // ===> Redux Actions
 import { showNotification } from "./features/notification/notificationSlice";
+import {
+    initializeBlogs,
+    createBlog,
+    likeBlog,
+    deleteBlog,
+} from "./features/blogs/blogsSlice";
 
 const App = () => {
     const [user, setUser] = useState(null);
-    const [blogs, setBlogs] = useState(null);
     const [isCreate, setIsCreate] = useState(false);
 
+    const blogs = useSelector((state) => state.blogs);
     const notification = useSelector((state) => state.notification);
     const dispatch = useDispatch();
 
@@ -28,15 +34,11 @@ const App = () => {
         }
     }, []);
 
-    // fetch all blogs from api
     useEffect(() => {
         const getBlogs = async () => {
             if (user) {
                 try {
-                    const blogsData = await blogApi.getAllBlogs(
-                        user.access_token
-                    );
-                    setBlogs([...blogsData]);
+                    await dispatch(initializeBlogs(user.access_token));
                 } catch (error) {
                     console.log(error.message);
                     dispatch(showNotification("error", error.message));
@@ -59,13 +61,9 @@ const App = () => {
         }
     };
 
-    const createBlog = async (blog) => {
+    const handleBlogCreate = async (blog) => {
         try {
-            const createdBlog = await blogApi.createBlog(
-                user.access_token,
-                blog
-            );
-            setBlogs([...blogs, createdBlog]);
+            await dispatch(createBlog(user.access_token, blog));
             setIsCreate(false);
             dispatch(showNotification("success", "A new blog has been added"));
         } catch (error) {
@@ -73,17 +71,9 @@ const App = () => {
             dispatch(showNotification("error", error.message));
         }
     };
-
     const handleBlogLike = async (blog) => {
         try {
-            const updatedBlog = await blogApi.likeBlog(user.access_token, blog);
-
-            setBlogs(
-                blogs.map((blog) =>
-                    blog.id === updatedBlog.id ? updatedBlog : blog
-                )
-            );
-
+            await dispatch(likeBlog(user.access_token, blog));
             dispatch(showNotification("success", "Blog Liked"));
         } catch (error) {
             console.log(error.message);
@@ -93,13 +83,7 @@ const App = () => {
 
     const handleBlogDelete = async (blogId) => {
         try {
-            const deletedBlog = await blogApi.deleteBlog(
-                user.access_token,
-                blogId
-            );
-
-            setBlogs(blogs.filter((blog) => blog.id !== deletedBlog.id));
-
+            await dispatch(deleteBlog(user.access_token, blogId));
             dispatch(showNotification("success", "Blog Deleted Successfully"));
         } catch (error) {
             console.log(error.message);
@@ -132,7 +116,11 @@ const App = () => {
 
                 {user && (
                     <>
-                        {isCreate && <CreateBlogForm createBlog={createBlog} />}
+                        {isCreate && (
+                            <CreateBlogForm
+                                handleBlogCreate={handleBlogCreate}
+                            />
+                        )}
 
                         <Blogs
                             blogsData={blogs}

@@ -3,18 +3,16 @@ import BlogDetails from "./BlogDetails";
 
 const Blogs = ({ blogsData, author, onBlogLike, onBlogDelete }) => {
     const blogElements =
-        blogsData &&
-        blogsData
-            .sort((a, b) => b.likes - a.likes)
-            .map((blog) => (
-                <BlogDetails
-                    key={blog.id}
-                    blog={blog}
-                    author={author}
-                    onBlogLike={onBlogLike}
-                    onBlogDelete={onBlogDelete}
-                />
-            ));
+        blogsData.length > 0 &&
+        blogsData.map((blog) => (
+            <BlogDetails
+                key={blog.id}
+                blog={blog}
+                author={author}
+                onBlogLike={onBlogLike}
+                onBlogDelete={onBlogDelete}
+            />
+        ));
 
     return (
         <div className="mt-8">

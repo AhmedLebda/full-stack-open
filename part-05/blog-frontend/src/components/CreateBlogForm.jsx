@@ -1,7 +1,7 @@
 import OptionButton from "./OptionButton";
 import { useState } from "react";
 
-const CreateBlogForm = ({ createBlog }) => {
+const CreateBlogForm = ({ handleBlogCreate }) => {
     const [createBlogData, setCreateBlogData] = useState({
         title: "",
         url: "",
@@ -17,7 +17,7 @@ const CreateBlogForm = ({ createBlog }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        createBlog(createBlogData);
+        handleBlogCreate(createBlogData);
     };
 
     return (
