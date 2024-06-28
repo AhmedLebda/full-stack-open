@@ -1,18 +1,14 @@
 import SectionHeader from "./SectionHeader";
 import BlogDetails from "./BlogDetails";
 
-const Blogs = ({ blogsData, author, onBlogLike, onBlogDelete }) => {
+import { useSelector } from "react-redux";
+
+const Blogs = () => {
+    const blogs = useSelector((state) => state.blogs);
+
     const blogElements =
-        blogsData.length > 0 &&
-        blogsData.map((blog) => (
-            <BlogDetails
-                key={blog.id}
-                blog={blog}
-                author={author}
-                onBlogLike={onBlogLike}
-                onBlogDelete={onBlogDelete}
-            />
-        ));
+        blogs.length > 0 &&
+        blogs.map((blog) => <BlogDetails key={blog.id} blog={blog} />);
 
     return (
         <div className="mt-8">

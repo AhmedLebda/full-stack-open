@@ -1,11 +1,37 @@
-import React from "react";
 import { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { likeBlog, deleteBlog } from "../features/blogs/blogsSlice";
+import { showNotification } from "../features/notification/notificationSlice";
 
-const BlogDetails = ({ blog, author, onBlogLike, onBlogDelete }) => {
+const BlogDetails = ({ blog }) => {
     const [viewDetails, setViewDetails] = useState(false);
+
+    const author = useSelector((state) => state.user?.name);
+    const accessToken = useSelector((state) => state.user?.access_token);
+    const dispatch = useDispatch();
 
     const showDeleteButton = (currentUser, blogAuthor) => {
         return currentUser === blogAuthor;
+    };
+
+    const handleBlogLike = async (blog) => {
+        try {
+            await dispatch(likeBlog(accessToken, blog));
+            dispatch(showNotification("success", "Blog Liked"));
+        } catch (error) {
+            console.log(error.message);
+            dispatch(showNotification("error", error.message));
+        }
+    };
+
+    const handleBlogDelete = async (blogId) => {
+        try {
+            await dispatch(deleteBlog(accessToken, blogId));
+            dispatch(showNotification("success", "Blog Deleted Successfully"));
+        } catch (error) {
+            console.log(error.message);
+            dispatch(showNotification("error", error.message));
+        }
     };
     return (
         <div
@@ -34,7 +60,7 @@ const BlogDetails = ({ blog, author, onBlogLike, onBlogDelete }) => {
                     {showDeleteButton(author, blog.user.name) && (
                         <button
                             className="border p-2 rounded-md bg-gray-100 hover:bg-gray-200"
-                            onClick={() => onBlogDelete(blog.id)}
+                            onClick={() => handleBlogDelete(blog.id)}
                         >
                             Delete
                         </button>
@@ -59,7 +85,7 @@ const BlogDetails = ({ blog, author, onBlogLike, onBlogDelete }) => {
                         <div className="flex gap-6 ">
                             <button
                                 className="bg-slate-900 hover:bg-slate-950 rounded-md px-6 py-2 font-bold capitalize text-white"
-                                onClick={() => onBlogLike(blog)}
+                                onClick={() => handleBlogLike(blog)}
                             >
                                 like
                             </button>

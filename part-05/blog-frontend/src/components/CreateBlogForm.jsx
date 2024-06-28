@@ -1,7 +1,13 @@
 import OptionButton from "./OptionButton";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+// Action creators
+import { createBlog } from "../features/blogs/blogsSlice";
+import { showNotification } from "../features/notification/notificationSlice";
 
-const CreateBlogForm = ({ handleBlogCreate }) => {
+const CreateBlogForm = ({ toggleIsCreate }) => {
+    const dispatch = useDispatch();
+    const accessToken = useSelector((state) => state.user?.access_token);
     const [createBlogData, setCreateBlogData] = useState({
         title: "",
         url: "",
@@ -14,14 +20,20 @@ const CreateBlogForm = ({ handleBlogCreate }) => {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleBlogCreate = async (e) => {
         e.preventDefault();
 
-        handleBlogCreate(createBlogData);
+        try {
+            await dispatch(createBlog(accessToken, createBlogData));
+            dispatch(showNotification("success", "A new blog has been added"));
+            toggleIsCreate();
+        } catch (error) {
+            dispatch(showNotification("error", error.message));
+        }
     };
 
     return (
-        <form className=" mb-6 pb-6 border-b-2 " onSubmit={handleSubmit}>
+        <form className=" mb-6 pb-6 border-b-2 " onSubmit={handleBlogCreate}>
             <h1 className="italic font-serif font-bold text-4xl text-blue-900 p-4">
                 Create a blog:
             </h1>

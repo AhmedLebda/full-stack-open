@@ -1,10 +1,17 @@
-import OptionButton from "./OptionButton";
 import { useState } from "react";
-const LoginForm = ({ login }) => {
+import { useDispatch } from "react-redux";
+import OptionButton from "./OptionButton";
+import { login } from "../features/user/userSlice";
+import { showNotification } from "../features/notification/notificationSlice";
+
+const LoginForm = () => {
+    const dispatch = useDispatch();
+
     const [credentials, setCredentials] = useState({
         username: "",
         password: "",
     });
+
     const handleChange = (e) => {
         setCredentials((prevCredentials) => ({
             ...prevCredentials,
@@ -12,16 +19,20 @@ const LoginForm = ({ login }) => {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
 
         const { username, password } = credentials;
 
-        login(username, password);
+        try {
+            await dispatch(login(username, password));
+        } catch (error) {
+            dispatch(showNotification("error", error.message));
+        }
     };
 
     return (
-        <form className=" mb-6 pb-6 border-b-2 " onSubmit={handleSubmit}>
+        <form className=" mb-6 pb-6 border-b-2 " onSubmit={handleLogin}>
             <h1 className="italic font-serif font-bold text-4xl text-blue-900 p-4">
                 Login:
             </h1>
