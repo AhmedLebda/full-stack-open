@@ -1,14 +1,29 @@
+// Components
 import SectionHeader from "./SectionHeader";
 import BlogDetails from "./BlogDetails";
+// React Query
+import { useQuery } from "@tanstack/react-query";
+// API
+import BlogApi from "../api/blog";
 
-import { useSelector } from "react-redux";
-
+// Get all blogs
 const Blogs = () => {
-    const blogs = useSelector((state) => state.blogs);
+    const {
+        data: blogs,
+        error,
+        isPending,
+    } = useQuery({
+        queryKey: ["blogs"],
+        queryFn: BlogApi.getAllBlogs,
+    });
 
-    const blogElements =
-        blogs.length > 0 &&
-        blogs.map((blog) => <BlogDetails key={blog.id} blog={blog} />);
+    const blogElements = blogs?.map((blog) => (
+        <BlogDetails key={blog.id} blog={blog} />
+    ));
+
+    if (isPending) return <h1 className="text-3xl font-bold">Loading...</h1>;
+
+    if (error) return <pre>An error has occurred: {error.message}</pre>;
 
     return (
         <div className="mt-8">

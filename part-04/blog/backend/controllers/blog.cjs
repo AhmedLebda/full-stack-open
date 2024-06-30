@@ -58,52 +58,70 @@ const blog_delete = async (req, res) => {
     }
 };
 
-const blog_update = async (req, res) => {
-    const { title } = req.body;
-
-    const blog = await Blog.findById(req.params.id);
-
-    if (!blog) {
-        return res.status(404).json({ error: "Blog not found" });
-    }
-
-    if (blog.user.toJSON() === req.userId) {
-        const updatedBlog = await Blog.findByIdAndUpdate(
-            req.params.id,
-            { title, $inc: { likes: 1 } },
-            {
-                new: true,
-                runValidators: true,
-                context: "query",
-            }
-        ).populate("user", {
-            password: 0,
-            posts: 0,
-            __v: 0,
-        });
-        res.status(200).json(updatedBlog);
-    } else {
-        const updatedBlog = await Blog.findByIdAndUpdate(
-            req.params.id,
-            { $inc: { likes: 1 } },
-            {
-                new: true,
-                runValidators: true,
-                context: "query",
-            }
-        ).populate("user", {
-            password: 0,
-            posts: 0,
-            __v: 0,
-        });
-        res.status(200).json(updatedBlog);
-    }
+const blog_like = async (req, res) => {
+    const updatedBlog = await Blog.findByIdAndUpdate(
+        req.params.id,
+        { $inc: { likes: 1 } },
+        {
+            new: true,
+            runValidators: true,
+            context: "query",
+        }
+    ).populate("user", {
+        password: 0,
+        posts: 0,
+        __v: 0,
+    });
+    res.status(200).json(updatedBlog);
 };
+
+//! need refactoring
+// const blog_update = async (req, res) => {
+//     const { title } = req.body;
+
+//     const blog = await Blog.findById(req.params.id);
+
+//     if (!blog) {
+//         return res.status(404).json({ error: "Blog not found" });
+//     }
+
+//     if (blog.user.toJSON() === req.userId) {
+//         const updatedBlog = await Blog.findByIdAndUpdate(
+//             req.params.id,
+//             { title, $inc: { likes: 1 } },
+//             {
+//                 new: true,
+//                 runValidators: true,
+//                 context: "query",
+//             }
+//         ).populate("user", {
+//             password: 0,
+//             posts: 0,
+//             __v: 0,
+//         });
+//         res.status(200).json(updatedBlog);
+//     } else {
+//         const updatedBlog = await Blog.findByIdAndUpdate(
+//             req.params.id,
+//             { $inc: { likes: 1 } },
+//             {
+//                 new: true,
+//                 runValidators: true,
+//                 context: "query",
+//             }
+//         ).populate("user", {
+//             password: 0,
+//             posts: 0,
+//             __v: 0,
+//         });
+//         res.status(200).json(updatedBlog);
+//     }
+// };
 
 module.exports = {
     blogs_list,
     blog_create,
     blog_detail,
     blog_delete,
-    blog_update,
+    blog_like,
 };

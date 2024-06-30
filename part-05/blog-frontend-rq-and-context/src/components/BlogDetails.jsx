@@ -1,42 +1,67 @@
 import { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { likeBlog, deleteBlog } from "../features/blogs/blogsSlice";
-
-// Custom hook for notification context
+// Redux
+import { useSelector } from "react-redux";
+// Custom hooks
 import useNotification from "../contexts/notification/useNotification";
+// React Query
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+// API
+import BlogApi from "../api/blog";
 
 const BlogDetails = ({ blog }) => {
+    // View blog details state
     const [viewDetails, setViewDetails] = useState(false);
 
+    // Redux: get author and access token from store
     const author = useSelector((state) => state.user?.name);
     const accessToken = useSelector((state) => state.user?.access_token);
-    const dispatch = useDispatch();
 
+    // context: use show notification function from custom hook
     const { showNotification } = useNotification();
 
+    // React Query: Mutations
+    const queryClient = useQueryClient();
+
+    const likeMutation = useMutation({
+        mutationFn: ({ accessToken, blog }) =>
+            BlogApi.likeBlog(accessToken, blog),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["blogs"] });
+            showNotification("success", "Blog Liked");
+        },
+        onError: (e) => {
+            console.log(e.message);
+            showNotification("error", e.message);
+        },
+    });
+
+    const deleteMutation = useMutation({
+        mutationFn: ({ accessToken, blogId }) =>
+            BlogApi.deleteBlog(accessToken, blogId),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["blogs"] });
+            showNotification("success", "Blog deleted");
+        },
+        onError: (e) => {
+            console.log(e.message);
+            showNotification("error", e.message);
+        },
+    });
+
+    // Only show delete button on posts of the logged in user
     const showDeleteButton = (currentUser, blogAuthor) => {
         return currentUser === blogAuthor;
     };
 
+    // Event Handlers:
     const handleBlogLike = async (blog) => {
-        try {
-            await dispatch(likeBlog(accessToken, blog));
-            showNotification("success", "Blog Liked");
-        } catch (error) {
-            console.log(error.message);
-            showNotification("error", error.message);
-        }
+        likeMutation.mutate({ accessToken, blog });
     };
 
     const handleBlogDelete = async (blogId) => {
-        try {
-            await dispatch(deleteBlog(accessToken, blogId));
-            showNotification("success", "Blog Deleted Successfully");
-        } catch (error) {
-            console.log(error.message);
-            showNotification("error", error.message);
-        }
+        deleteMutation.mutate({ accessToken, blogId });
     };
+
     return (
         <div
             id={blog.id}

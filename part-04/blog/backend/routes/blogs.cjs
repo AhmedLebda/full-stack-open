@@ -13,6 +13,8 @@ router.post("/", blogController.blog_create);
 
 router.delete("/:id", blogController.blog_delete);
 
-router.put("/:id", blogController.blog_update);
+// router.put("/:id", blogController.blog_update);
+
+router.patch("/:id", blogController.blog_like);
 
 module.exports = router;

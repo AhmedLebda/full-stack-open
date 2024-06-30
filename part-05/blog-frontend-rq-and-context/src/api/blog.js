@@ -40,9 +40,9 @@ const createBlog = async (token, blogData) => {
 };
 
 const likeBlog = async (token, blog) => {
-    const { id, likes } = blog;
+    const { id } = blog;
     const response = await fetch(`${baseUrl}/blogs/${id}`, {
-        method: "PUT",
+        method: "PATCH",
         mode: "cors",
         headers: {
             "Content-Type": "application/json",

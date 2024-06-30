@@ -1,21 +1,44 @@
-import OptionButton from "./OptionButton";
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-// Action creators
-import { createBlog } from "../features/blogs/blogsSlice";
-
+// Components
+import OptionButton from "./OptionButton";
+// Redux
+import { useSelector } from "react-redux";
+// Custom hooks
 import useNotification from "../contexts/notification/useNotification";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+// API
+import BlogApi from "../api/blog";
 
 const CreateBlogForm = ({ toggleIsCreate }) => {
-    const dispatch = useDispatch();
+    // Redux: Get user access token
     const accessToken = useSelector((state) => state.user?.access_token);
+
+    // Create form state
     const [createBlogData, setCreateBlogData] = useState({
         title: "",
         url: "",
     });
 
+    // context: use show notification function from custom hook
     const { showNotification } = useNotification();
 
+    // React Query: Mutations
+    const queryClient = useQueryClient();
+
+    const createMutation = useMutation({
+        mutationFn: ({ token, blogData }) =>
+            BlogApi.createBlog(token, blogData),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["blogs"] });
+            showNotification("success", "Blog Created");
+        },
+        onError: (e) => {
+            console.log(e.message);
+            showNotification("error", e.message);
+        },
+    });
+
+    // Event Handlers
     const handleChange = (e) => {
         setCreateBlogData((prevFormData) => ({
             ...prevFormData,
@@ -25,14 +48,8 @@ const CreateBlogForm = ({ toggleIsCreate }) => {
 
     const handleBlogCreate = async (e) => {
         e.preventDefault();
-
-        try {
-            await dispatch(createBlog(accessToken, createBlogData));
-            showNotification("success", "A new blog has been added");
-            toggleIsCreate();
-        } catch (error) {
-            showNotification("error", error.message);
-        }
+        createMutation.mutate({ token: accessToken, blogData: createBlogData });
+        toggleIsCreate();
     };
 
     return (
