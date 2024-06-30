@@ -1,20 +1,22 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+// Components
 import OptionButton from "./OptionButton";
-import { login } from "../features/user/userSlice";
-
+// Context
 import useNotification from "../contexts/notification/useNotification";
+import useUser from "../contexts/user/useUser";
 
 const LoginForm = () => {
-    const dispatch = useDispatch();
-
+    // Form state
     const [credentials, setCredentials] = useState({
         username: "",
         password: "",
     });
 
+    // Context
     const { showNotification } = useNotification();
+    const userActions = useUser();
 
+    // Event Handlers
     const handleChange = (e) => {
         setCredentials((prevCredentials) => ({
             ...prevCredentials,
@@ -26,9 +28,9 @@ const LoginForm = () => {
         e.preventDefault();
 
         const { username, password } = credentials;
-
         try {
-            await dispatch(login(username, password));
+            await userActions.login(username, password);
+            showNotification("success", "Welcome");
         } catch (error) {
             showNotification("error", error.message);
         }

@@ -11,19 +11,27 @@ const Blogs = () => {
     const {
         data: blogs,
         error,
-        isPending,
+        isLoading,
     } = useQuery({
         queryKey: ["blogs"],
         queryFn: BlogApi.getAllBlogs,
     });
 
+    if (error) console.log(error);
+
     const blogElements = blogs?.map((blog) => (
         <BlogDetails key={blog.id} blog={blog} />
     ));
 
-    if (isPending) return <h1 className="text-3xl font-bold">Loading...</h1>;
+    if (isLoading) return <h1 className="text-3xl font-bold">Loading...</h1>;
 
-    if (error) return <pre>An error has occurred: {error.message}</pre>;
+    if (error)
+        return (
+            <pre>
+                An error has occurred: Server is down right now please try again
+                later
+            </pre>
+        );
 
     return (
         <div className="mt-8">

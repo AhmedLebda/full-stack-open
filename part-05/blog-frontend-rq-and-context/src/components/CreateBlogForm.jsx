@@ -1,18 +1,15 @@
 import { useState } from "react";
 // Components
 import OptionButton from "./OptionButton";
-// Redux
-import { useSelector } from "react-redux";
-// Custom hooks
+// Contexts
 import useNotification from "../contexts/notification/useNotification";
+import useUser from "../contexts/user/useUser";
+// React Query
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 // API
 import BlogApi from "../api/blog";
 
 const CreateBlogForm = ({ toggleIsCreate }) => {
-    // Redux: Get user access token
-    const accessToken = useSelector((state) => state.user?.access_token);
-
     // Create form state
     const [createBlogData, setCreateBlogData] = useState({
         title: "",
@@ -21,6 +18,8 @@ const CreateBlogForm = ({ toggleIsCreate }) => {
 
     // context: use show notification function from custom hook
     const { showNotification } = useNotification();
+    const userActions = useUser();
+    const accessToken = userActions.getAccessToken();
 
     // React Query: Mutations
     const queryClient = useQueryClient();

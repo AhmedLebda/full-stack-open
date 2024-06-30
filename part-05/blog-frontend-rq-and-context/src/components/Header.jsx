@@ -1,13 +1,13 @@
-import { useDispatch, useSelector } from "react-redux";
-import { removeUser } from "../features/user/userSlice";
+// Context
+import useUser from "../contexts/user/useUser";
 
 const Header = ({ onCreate }) => {
-    const dispatch = useDispatch();
-    const fullName = useSelector((state) => state.user?.name);
+    const userActions = useUser();
+
+    const fullName = userActions.getName();
 
     const handleLogout = () => {
-        localStorage.removeItem("user");
-        dispatch(removeUser());
+        userActions.logout();
     };
 
     return (

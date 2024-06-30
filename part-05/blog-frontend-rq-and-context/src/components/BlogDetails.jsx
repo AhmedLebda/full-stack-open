@@ -1,8 +1,7 @@
 import { useState } from "react";
-// Redux
-import { useSelector } from "react-redux";
 // Custom hooks
 import useNotification from "../contexts/notification/useNotification";
+import useUser from "../contexts/user/useUser";
 // React Query
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 // API
@@ -12,12 +11,11 @@ const BlogDetails = ({ blog }) => {
     // View blog details state
     const [viewDetails, setViewDetails] = useState(false);
 
-    // Redux: get author and access token from store
-    const author = useSelector((state) => state.user?.name);
-    const accessToken = useSelector((state) => state.user?.access_token);
-
-    // context: use show notification function from custom hook
+    // context
     const { showNotification } = useNotification();
+    const userActions = useUser();
+    const author = userActions.getName();
+    const accessToken = userActions.getAccessToken();
 
     // React Query: Mutations
     const queryClient = useQueryClient();
