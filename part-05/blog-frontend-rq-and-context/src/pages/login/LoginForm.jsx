@@ -1,9 +1,11 @@
 import { useState } from "react";
 // Components
-import OptionButton from "./OptionButton";
+import OptionButton from "../../components/OptionButton";
 // Context
-import useNotification from "../contexts/notification/useNotification";
-import useUser from "../contexts/user/useUser";
+import useNotification from "../../contexts/notification/useNotification";
+import useUser from "../../contexts/user/useUser";
+// React Router
+import { Navigate } from "react-router-dom";
 
 const LoginForm = () => {
     // Form state
@@ -15,6 +17,12 @@ const LoginForm = () => {
     // Context
     const { showNotification } = useNotification();
     const userActions = useUser();
+    const token = userActions.getAccessToken();
+
+    // Redirect to home page if user is already logged in
+    if (token) {
+        return <Navigate to="/" />;
+    }
 
     // Event Handlers
     const handleChange = (e) => {
@@ -37,7 +45,10 @@ const LoginForm = () => {
     };
 
     return (
-        <form className=" mb-6 pb-6 border-b-2 " onSubmit={handleLogin}>
+        <form
+            className=" mb-6 pb-6 border-b-2 text-center"
+            onSubmit={handleLogin}
+        >
             <h1 className="italic font-serif font-bold text-4xl text-blue-900 p-4">
                 Login:
             </h1>

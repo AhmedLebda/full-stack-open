@@ -1,13 +1,13 @@
 import { useState } from "react";
 // Components
-import OptionButton from "./OptionButton";
+import OptionButton from "../../components/OptionButton";
 // Contexts
-import useNotification from "../contexts/notification/useNotification";
-import useUser from "../contexts/user/useUser";
+import useNotification from "../../contexts/notification/useNotification";
+import useUser from "../../contexts/user/useUser";
 // React Query
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 // API
-import BlogApi from "../api/blog";
+import BlogApi from "../../api/blog";
 
 const CreateBlogForm = ({ toggleIsCreate }) => {
     // Create form state
@@ -52,7 +52,10 @@ const CreateBlogForm = ({ toggleIsCreate }) => {
     };
 
     return (
-        <form className=" mb-6 pb-6 border-b-2 " onSubmit={handleBlogCreate}>
+        <form
+            className=" mb-6 pb-6 border-b-2 text-center"
+            onSubmit={handleBlogCreate}
+        >
             <h1 className="italic font-serif font-bold text-4xl text-blue-900 p-4">
                 Create a blog:
             </h1>

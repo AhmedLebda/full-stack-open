@@ -1,9 +1,6 @@
 import notificationContext from "./notificationContext";
 import { useContext } from "react";
-import {
-    setNotification,
-    removeNotification,
-} from "../../features/notification/notificationSlice";
+import { setNotification, removeNotification } from "./notificationActions";
 import { sleep } from "../../utils";
 
 const useNotification = () => {

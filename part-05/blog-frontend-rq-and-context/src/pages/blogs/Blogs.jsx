@@ -1,10 +1,10 @@
 // Components
-import SectionHeader from "./SectionHeader";
-import BlogDetails from "./BlogDetails";
+import SectionHeader from "../../components/SectionHeader";
+import BlogDetails from "../../components/BlogDetails";
 // React Query
 import { useQuery } from "@tanstack/react-query";
 // API
-import BlogApi from "../api/blog";
+import BlogApi from "../../api/blog";
 
 // Get all blogs
 const Blogs = () => {
