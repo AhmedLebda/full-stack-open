@@ -25,6 +25,7 @@ const useUser = () => {
         getAccessToken: () => user?.access_token,
         getName: () => user?.name,
         getUsername: () => user?.username,
+        getUserId: () => user?.id,
     };
 
     return userActions;

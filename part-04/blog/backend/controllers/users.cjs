@@ -7,6 +7,16 @@ const users_list = async (req, res) => {
     });
     res.json(users);
 };
+const user_detail = async (req, res) => {
+    const id = req.params.id;
+    const user = await User.findOne(
+        { _id: id },
+        { name: 1, posts: 1 }
+    ).populate("posts", {
+        user: 0,
+    });
+    res.json(user);
+};
 
 const user_create = async (req, res) => {
     const { username, password, name } = req.body;
@@ -34,7 +44,12 @@ const user_login = async (req, res) => {
         id: user._id,
     });
 
-    res.json({ access_token: token, username: user.username, name: user.name });
+    res.json({
+        access_token: token,
+        username: user.username,
+        name: user.name,
+        id: user.id,
+    });
 };
 
-module.exports = { users_list, user_create, user_login };
+module.exports = { users_list, user_create, user_login, user_detail };

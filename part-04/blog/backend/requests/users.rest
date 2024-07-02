@@ -1,5 +1,11 @@
 #! Get all users
 GET http://localhost:3000/api/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QgdXNlciIsImlkIjoiNjY2YzhjNGU3YjI3OGE1MTg4Njg3NDFkIiwiaWF0IjoxNzE5OTQ0MjEyLCJleHAiOjE3MTk5NDc4MTJ9.e-L9zOLcJwG453ggcM_KNhRGlYMKly9e40-TFT_sTxk
+###
+#! Get user with id
+Get http://localhost:3000/api/users/666999f17e653c2edd123e28
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QgdXNlciIsImlkIjoiNjY2YzhjNGU3YjI3OGE1MTg4Njg3NDFkIiwiaWF0IjoxNzE5OTQ0MjEyLCJleHAiOjE3MTk5NDc4MTJ9.e-L9zOLcJwG453ggcM_KNhRGlYMKly9e40-TFT_sTxk
 
 ###
 #! Create a new user

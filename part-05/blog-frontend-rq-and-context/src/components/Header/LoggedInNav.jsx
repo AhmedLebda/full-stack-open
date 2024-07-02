@@ -2,14 +2,16 @@ import { NavLink, Link } from "react-router-dom";
 import useUser from "../../contexts/user/useUser";
 
 const LoggedInNav = () => {
-    const { getName, logout } = useUser();
+    const { getName, logout, getUserId } = useUser();
+
     const fullName = getName();
+    const userId = getUserId();
 
     return (
         <nav className="flex gap-4 items-center flex-1 justify-end">
-            <a href="/" className="italic font-bold mx-auto">
+            <Link to={`/users/${userId}`} className="italic font-bold mx-auto">
                 welcome <span className="text-blue-900">{fullName}</span>
-            </a>
+            </Link>
             <NavLink
                 to="/blogs"
                 className="text-blue-700 underline font-bold capitalize"
