@@ -16,6 +16,12 @@ const LoggedInNav = () => {
             >
                 blogs
             </NavLink>
+            <NavLink
+                to="/users"
+                className="text-blue-700 underline font-bold capitalize"
+            >
+                Users Info
+            </NavLink>
             <Link
                 to="/"
                 className="bg-red-600 hover:bg-red-650 rounded-md px-6 py-2 font-bold capitalize text-white"
@@ -24,7 +30,7 @@ const LoggedInNav = () => {
                 Logout
             </Link>
             <NavLink
-                to="/create"
+                to="/blogs/create"
                 className="bg-green-600 hover:bg-green-650 rounded-md px-6 py-2 font-bold capitalize text-white"
             >
                 Create blog

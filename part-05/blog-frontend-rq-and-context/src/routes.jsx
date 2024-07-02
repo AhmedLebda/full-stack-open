@@ -4,10 +4,11 @@ import RootLayout from "./pages/layouts/RootLayout";
 // Pages
 import ErrorPage from "./pages/error/ErrorPage";
 import Home from "./pages/home/Home";
-import Blogs from "./pages/blogs/Blogs";
+import Blogs from "./pages/blogs/index/Blogs";
 import LoginForm from "./pages/login/LoginForm";
 import ProtectedRoute from "./components/ProtectedRoute";
-import CreateBlogForm from "./pages/create_blog/CreateBlogForm";
+import CreateBlogForm from "./pages/blogs/create_blog/CreateBlogForm";
+import UsersInfo from "./pages/users/index/UsersInfo";
 const router = createBrowserRouter([
     {
         path: "/",
@@ -23,17 +24,23 @@ const router = createBrowserRouter([
                 element: <LoginForm />,
             },
             {
+                path: "blogs",
                 element: <ProtectedRoute />,
                 children: [
                     {
-                        path: "/blogs",
+                        index: true,
                         element: <Blogs />,
                     },
                     {
-                        path: "/create",
+                        path: "create",
                         element: <CreateBlogForm />,
                     },
                 ],
+            },
+            {
+                path: "users",
+                element: <ProtectedRoute />,
+                children: [{ index: true, element: <UsersInfo /> }],
             },
         ],
     },

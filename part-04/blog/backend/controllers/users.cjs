@@ -2,7 +2,9 @@ const User = require("../models/user.cjs");
 const authHelper = require("../utils/auth_helper.cjs");
 
 const users_list = async (req, res) => {
-    const users = await User.find({}).populate("posts", { user: 0 });
+    const users = await User.find({}, { name: 1, posts: 1 }).populate("posts", {
+        user: 0,
+    });
     res.json(users);
 };
 

@@ -6,6 +6,7 @@ import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 // React Router
 import { RouterProvider } from "react-router-dom";
 import router from "./routes.jsx";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 const App = () => {
     const queryClient = new QueryClient();
@@ -15,6 +16,7 @@ const App = () => {
             <UserContextProvider>
                 <NotificationContextProvider>
                     <RouterProvider router={router} />
+                    <ReactQueryDevtools />
                 </NotificationContextProvider>
             </UserContextProvider>
         </QueryClientProvider>
