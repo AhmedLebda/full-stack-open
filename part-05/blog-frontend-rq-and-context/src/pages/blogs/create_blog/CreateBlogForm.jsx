@@ -6,15 +6,19 @@ import useNotification from "../../../contexts/notification/useNotification";
 import useUser from "../../../contexts/user/useUser";
 // React Query
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+// React Router
+import { Navigate } from "react-router-dom";
 // API
 import BlogApi from "../../../api/blog";
 
-const CreateBlogForm = ({ toggleIsCreate }) => {
+const CreateBlogForm = () => {
     // Create form state
     const [createBlogData, setCreateBlogData] = useState({
         title: "",
         url: "",
     });
+
+    const [redirect, setRedirect] = useState(false);
 
     // context: use show notification function from custom hook
     const { showNotification } = useNotification();
@@ -30,6 +34,7 @@ const CreateBlogForm = ({ toggleIsCreate }) => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["blogs"] });
             showNotification("success", "Blog Created");
+            setRedirect(true);
         },
         onError: (e) => {
             console.log(e.message);
@@ -48,8 +53,9 @@ const CreateBlogForm = ({ toggleIsCreate }) => {
     const handleBlogCreate = async (e) => {
         e.preventDefault();
         createMutation.mutate({ token: accessToken, blogData: createBlogData });
-        toggleIsCreate();
     };
+
+    if (redirect) return <Navigate to="/blogs" />;
 
     return (
         <form

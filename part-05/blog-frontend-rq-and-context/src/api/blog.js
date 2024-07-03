@@ -1,7 +1,7 @@
-const baseUrl = "./api";
+const baseUrl = "/api/blogs";
 
 const getAllBlogs = async (token) => {
-    const response = await fetch(`${baseUrl}/blogs`, {
+    const response = await fetch(`${baseUrl}`, {
         method: "GET",
         mode: "cors",
         headers: {
@@ -19,8 +19,17 @@ const getAllBlogs = async (token) => {
     return data;
 };
 
+const getBlogById = async (blogId) => {
+    const response = await fetch(`${baseUrl}/${blogId}`);
+    const data = await response.json();
+
+    if (!response.ok) throw Error(data.error);
+
+    return data;
+};
+
 const createBlog = async (token, blogData) => {
-    const response = await fetch(`${baseUrl}/blogs`, {
+    const response = await fetch(`${baseUrl}`, {
         method: "POST",
         mode: "cors",
         headers: {
@@ -41,7 +50,7 @@ const createBlog = async (token, blogData) => {
 
 const likeBlog = async (token, blog) => {
     const { id } = blog;
-    const response = await fetch(`${baseUrl}/blogs/${id}`, {
+    const response = await fetch(`${baseUrl}/${id}`, {
         method: "PATCH",
         mode: "cors",
         headers: {
@@ -60,7 +69,7 @@ const likeBlog = async (token, blog) => {
 };
 
 const deleteBlog = async (token, blogId) => {
-    const response = await fetch(`${baseUrl}/blogs/${blogId}`, {
+    const response = await fetch(`${baseUrl}/${blogId}`, {
         method: "DELETE",
         mode: "cors",
         headers: {
@@ -78,4 +87,4 @@ const deleteBlog = async (token, blogId) => {
     return data;
 };
 
-export default { getAllBlogs, createBlog, likeBlog, deleteBlog };
+export default { getAllBlogs, getBlogById, createBlog, likeBlog, deleteBlog };

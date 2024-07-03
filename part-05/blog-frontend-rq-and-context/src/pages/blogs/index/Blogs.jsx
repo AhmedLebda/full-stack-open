@@ -5,6 +5,8 @@ import BlogDetails from "../../../components/BlogDetails";
 import { useQuery } from "@tanstack/react-query";
 // API
 import BlogApi from "../../../api/blog";
+// React Router
+import { Link } from "react-router-dom";
 
 // Get all blogs
 const Blogs = () => {
@@ -19,8 +21,16 @@ const Blogs = () => {
 
     if (error) console.log(error);
 
-    const blogElements = blogs?.map((blog) => (
-        <BlogDetails key={blog.id} blog={blog} />
+    const blogsList = blogs?.map((blog) => (
+        <li className=" capitalize font-bold text-lg p-4 border-b-2">
+            <Link
+                key={blog.id}
+                to={blog.id}
+                className="text-blue-600 hover:text-blue-800 "
+            >
+                {blog.title}
+            </Link>
+        </li>
     ));
 
     if (isLoading) return <h1 className="text-3xl font-bold">Loading...</h1>;
@@ -36,7 +46,7 @@ const Blogs = () => {
     return (
         <div className="mt-8">
             <SectionHeader text="All blogs" />
-            {blogElements}
+            <ul className="list-disc px-8">{blogsList}</ul>
         </div>
     );
 };
