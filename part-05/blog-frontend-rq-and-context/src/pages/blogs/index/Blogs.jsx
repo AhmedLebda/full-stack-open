@@ -1,6 +1,5 @@
 // Components
 import SectionHeader from "../../../components/SectionHeader";
-import BlogDetails from "../../../components/BlogDetails";
 // React Query
 import { useQuery } from "@tanstack/react-query";
 // API
@@ -22,12 +21,11 @@ const Blogs = () => {
     if (error) console.log(error);
 
     const blogsList = blogs?.map((blog) => (
-        <li className=" capitalize font-bold text-lg p-4 border-b-2">
-            <Link
-                key={blog.id}
-                to={blog.id}
-                className="text-blue-600 hover:text-blue-800 "
-            >
+        <li
+            key={blog.id}
+            className=" capitalize font-bold text-lg p-4 border-b-2"
+        >
+            <Link to={blog.id} className="text-blue-600 hover:text-blue-800 ">
                 {blog.title}
             </Link>
         </li>

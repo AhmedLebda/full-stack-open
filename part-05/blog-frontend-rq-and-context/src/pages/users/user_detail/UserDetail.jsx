@@ -17,7 +17,7 @@ const UserDetail = () => {
         queryKey: ["users", id],
         queryFn: () => UserApi.getUserById(token, id),
     });
-    console.log(data);
+
     if (isLoading) return <h1 className="text-3xl font-bold">Loading...</h1>;
 
     if (error) return <pre>An error has occurred: {error.message}</pre>;
@@ -31,7 +31,10 @@ const UserDetail = () => {
             {data.posts.length > 0 ? (
                 <ul className="list-disc px-8">
                     {data.posts.map((post) => (
-                        <li className="text-blue-600 underline underline-offset-2 p-4 m-2  ">
+                        <li
+                            key={post.id}
+                            className="text-blue-600 underline underline-offset-2 p-4 m-2  "
+                        >
                             <Link to={`/blogs/${post.id}`}>{post.title}</Link>
                         </li>
                     ))}

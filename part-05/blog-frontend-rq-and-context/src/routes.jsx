@@ -12,7 +12,7 @@ import CreateBlogForm from "./pages/blogs/create_blog/CreateBlogForm";
 // Users
 import UsersInfo from "./pages/users/index/UsersInfo";
 import UserDetail from "./pages/users/user_detail/UserDetail";
-import BlogDetails from "./components/BlogDetails";
+import BlogDetails from "./pages/blogs/blog_details/BlogDetails";
 const router = createBrowserRouter([
     {
         path: "/",
@@ -40,7 +40,7 @@ const router = createBrowserRouter([
                         element: <CreateBlogForm />,
                     },
                     {
-                        path: ":id",
+                        path: ":blogId",
                         element: <BlogDetails />,
                     },
                 ],
