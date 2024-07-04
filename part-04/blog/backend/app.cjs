@@ -7,6 +7,7 @@ const dbConnection = require("./dbConnection.cjs");
 
 const blogRoutes = require("./routes/blogs.cjs");
 const usersRoutes = require("./routes/users.cjs");
+const commentsRoutes = require("./routes/comments.cjs");
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use(express.static("public"));
 dbConnection();
 
 // ### Routes ### //
+app.use("/api/blogs/:blogId/comments", commentsRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/users", usersRoutes);
 
