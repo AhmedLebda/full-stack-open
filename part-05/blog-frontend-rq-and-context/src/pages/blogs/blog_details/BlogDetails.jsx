@@ -13,7 +13,7 @@ import { useParams, Link, Navigate } from "react-router-dom";
 import BlogApi from "../../../api/blog";
 
 const BlogDetails = () => {
-    const [redirect, setRedirect] = useState(false);
+    const [redirect, setRedirect] = useState("");
     const [showCommentBox, setShowCommentBox] = useState(false);
     const [comment, setComment] = useState("");
     const { blogId } = useParams();
@@ -39,6 +39,7 @@ const BlogDetails = () => {
     const blogAuthorUsername = blog?.user.username;
     const isBlogOwner = currentUsername === blogAuthorUsername;
     const accessToken = userActions.getAccessToken();
+    const isAuthenticated = userActions.isAuthenticated();
 
     // React Query: Mutations
     const queryClient = useQueryClient();
@@ -52,7 +53,7 @@ const BlogDetails = () => {
         },
         onError: (e) => {
             console.log(e.message);
-            showNotification("error", e.message);
+            showNotification("error", "Please log in first");
         },
     });
 
@@ -62,11 +63,11 @@ const BlogDetails = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["blogs", blogId] });
             showNotification("success", "Blog deleted");
-            setRedirect(true);
+            setRedirect("/blogs");
         },
         onError: (e) => {
             console.log(e.message);
-            showNotification("error", e.message);
+            showNotification("error", "Please log in first");
         },
     });
 
@@ -79,20 +80,38 @@ const BlogDetails = () => {
         },
         onError: (e) => {
             console.log(e.message);
-            showNotification("error", e.message);
+            showNotification("error", "Please log in first");
         },
     });
 
     // Event Handlers:
     const handleBlogLike = async (blog) => {
+        if (!isAuthenticated) {
+            setRedirect("/login");
+        }
         likeMutation.mutate({ accessToken, blog });
     };
 
     const handleBlogDelete = async (blogId) => {
+        if (!isAuthenticated) {
+            setRedirect("/login");
+        }
         deleteMutation.mutate({ accessToken, blogId });
     };
+    const handleCommentBoxOpen = () => {
+        if (!isAuthenticated) {
+            showNotification("error", "Please log in first");
+            setRedirect("/login");
+            return;
+        }
+        setShowCommentBox(!showCommentBox);
+    };
+
     const handleCommentAdd = async (e, blogId) => {
         e.preventDefault();
+        if (!isAuthenticated) {
+            setRedirect("/login");
+        }
 
         commentMutation.mutate({ accessToken, blogId, content: comment });
         setComment("");
@@ -102,7 +121,7 @@ const BlogDetails = () => {
 
     if (error) return <pre>An error has occurred: {error.message}</pre>;
 
-    if (redirect) return <Navigate to="/blogs" />;
+    if (redirect) return <Navigate to={redirect} />;
 
     return (
         <div id={blog.id} className="p-4 mb-4 rounded-md">
@@ -154,7 +173,7 @@ const BlogDetails = () => {
                     </button>
                     <button
                         className="bg-blue-800 hover:bg-blue-900 rounded-md px-4 py-2 font-bold capitalize text-white"
-                        onClick={() => setShowCommentBox(!showCommentBox)}
+                        onClick={handleCommentBoxOpen}
                     >
                         comment
                     </button>

@@ -3,6 +3,8 @@ import userContext from "./userContext";
 import { setUser, removeUser } from "./userActions";
 // API
 import AuthApi from "../../api/auth";
+// utils
+import { isJwtExpired } from "../../utils";
 
 const useUser = () => {
     const context = useContext(userContext);
@@ -26,6 +28,12 @@ const useUser = () => {
         getName: () => user?.name,
         getUsername: () => user?.username,
         getUserId: () => user?.id,
+        isAuthenticated: () => {
+            if (!user?.access_token || isJwtExpired()) {
+                return false;
+            }
+            return true;
+        },
     };
 
     return userActions;
