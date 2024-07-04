@@ -24,24 +24,24 @@ const router = createBrowserRouter([
                 element: <Home />,
             },
             {
-                path: "/login",
+                path: "login",
                 element: <LoginForm />,
             },
             {
                 path: "blogs",
+                element: <Blogs />,
+            },
+            {
+                path: "blogs/:blogId",
+                element: <BlogDetails />,
+            },
+            {
+                path: "blogs/create",
                 element: <ProtectedRoute />,
                 children: [
                     {
                         index: true,
-                        element: <Blogs />,
-                    },
-                    {
-                        path: "create",
                         element: <CreateBlogForm />,
-                    },
-                    {
-                        path: ":blogId",
-                        element: <BlogDetails />,
                     },
                 ],
             },
