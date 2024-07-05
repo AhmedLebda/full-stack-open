@@ -1,6 +1,6 @@
 import { parseArgs } from "./utils";
 
-const bmiCalculator = (height: number, weight: number): string => {
+export const bmiCalculator = (height: number, weight: number): string => {
     const bmi = weight / (height / 100) ** 2;
     switch (true) {
         case bmi < 18.5:
