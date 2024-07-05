@@ -1,6 +1,6 @@
-import { parseArgs } from "./utils";
+// import { parseArgs } from "./utils";
 
-interface exerciseResult {
+export interface exerciseResult {
     sessionDuration: number;
     trainedDays: number;
     target: number;
@@ -10,7 +10,7 @@ interface exerciseResult {
     rating_description: string;
 }
 
-const exerciseCalculator = (data: Array<number>): exerciseResult => {
+export const exerciseCalculator = (data: Array<number>): exerciseResult => {
     const target: number = data[0];
     const exerciseHours: number[] = data.slice(1);
     const sessionDuration = exerciseHours.length;
@@ -61,9 +61,9 @@ const exerciseCalculator = (data: Array<number>): exerciseResult => {
     };
 };
 
-try {
-    const values = parseArgs(process.argv);
-    console.log(exerciseCalculator(values));
-} catch (error: unknown) {
-    if (error instanceof Error) throw Error(error.message);
-}
+// try {
+//     const values = parseArgs(process.argv);
+//     console.log(exerciseCalculator(values));
+// } catch (error: unknown) {
+//     if (error instanceof Error) throw Error(error.message);
+// }
