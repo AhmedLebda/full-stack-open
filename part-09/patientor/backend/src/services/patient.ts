@@ -1,7 +1,9 @@
 // Data
 import patientsData from "../data/patients";
 // Types
-import { PatientPrivate, Patient } from "../utils/types";
+import { PatientPrivate, Patient, NewPatientData } from "../utils/types";
+// Helpers
+import { getRandomId } from "../utils/helpers";
 
 const patients_list = (): PatientPrivate[] => {
     return patientsData.map((patient: Patient) => {
@@ -15,4 +17,12 @@ const patients_list = (): PatientPrivate[] => {
     });
 };
 
-export default { patients_list };
+const patient_create = (newPatientData: NewPatientData): PatientPrivate => {
+    const newPatient: PatientPrivate = {
+        id: getRandomId(),
+        ...newPatientData,
+    };
+    return newPatient;
+};
+
+export default { patients_list, patient_create };
