@@ -16,9 +16,9 @@ interface EntriesProps {
 }
 
 const Entries = ({ entries }: EntriesProps) => {
-    const entryKeys: string[] = Object.keys(entries[0]).filter(
-        (key) => key !== "id"
-    );
+    const entryKeys: string[] | boolean =
+        entries.length > 0 &&
+        Object.keys(entries[0]).filter((key) => key !== "id");
 
     const totalFlights = entries.length;
     return (
@@ -26,14 +26,15 @@ const Entries = ({ entries }: EntriesProps) => {
             <TableCaption>A list of recent flights.</TableCaption>
             <TableHeader>
                 <TableRow className="bg-slate-300/50 ">
-                    {entryKeys.map((key) => (
-                        <TableHead
-                            key={key}
-                            className="text-zinc-900 capitalize font-bold"
-                        >
-                            {key}
-                        </TableHead>
-                    ))}
+                    {entryKeys &&
+                        entryKeys.map((key) => (
+                            <TableHead
+                                key={key}
+                                className="text-zinc-900 capitalize font-bold"
+                            >
+                                {key}
+                            </TableHead>
+                        ))}
                 </TableRow>
             </TableHeader>
 
