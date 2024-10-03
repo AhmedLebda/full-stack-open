@@ -1,61 +1,33 @@
-require("dotenv").config();
 const express = require("express");
-const Blog = require("./models/blog");
 const app = express();
+require("express-async-errors");
+
+const { PORT } = require("./util/config");
+const { ConnectToDatabase } = require("./util/db");
+
+const errorHandler = require("./middlewares/error/errorHandler");
+const BlogRouter = require("./controllers/blog");
 
 // Middlewares
 app.use(express.json());
-const PORT = process.env.PORT || 3001;
 
-app.listen(PORT, () => {
-	console.log(`INFO: Server running on port ${PORT}`);
-});
+// Routes
+app.use("/api/blogs", BlogRouter);
 
-app.get("/api/blogs", async (_req, res) => {
+// Error handler
+app.use(errorHandler);
+
+// Start server and connect to database
+const start = async () => {
 	try {
-		const blogs = await Blog.findAll();
-		res.json(blogs);
-	} catch (error) {
-		console.error(error);
-		res.status(500).json({ error: "Server error" });
+		await ConnectToDatabase();
+		app.listen(PORT, () => {
+			console.log("Server is running on port 3000");
+		});
+	} catch (err) {
+		console.log(err);
+		process.exit(1);
 	}
-});
+};
 
-app.post("/api/blogs", async (req, res) => {
-	try {
-		const createdBlog = await Blog.create(req.body);
-		res.status(201).json(createdBlog);
-	} catch (error) {
-		console.log(error);
-		res.status(500).json({ error: "Server error" });
-	}
-});
-
-app.delete("/api/blogs/:id", async (req, res) => {
-	try {
-		const blog = await Blog.findByPk(req.params.id);
-		if (!blog) {
-			return res.status(404).json({ error: "Blog not found" });
-		}
-		await blog.destroy();
-		res.status(204).end();
-	} catch (error) {
-		console.error(error);
-		res.status(500).json({ error: "Server error" });
-	}
-});
-
-app.patch("/api/blogs/:id", async (req, res) => {
-	try {
-		const blog = await Blog.findByPk(req.params.id);
-		if (!blog) {
-			return res.status(404).json({ error: "Blog not found" });
-		}
-		blog.likes += 1;
-		await blog.save();
-		res.json(blog);
-	} catch (error) {
-		console.error(error);
-		res.status(500).json({ error: "Server error" });
-	}
-});
+start();
