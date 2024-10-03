@@ -1,24 +1,25 @@
 {
-  "name": "course-material",
-  "version": "1.0.0",
-  "description": "following part 13 course material",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [
-    "SQL",
-    "PostgreSQL",
-    "Express",
-    "Sequelize",
-    "NodeJS"
-  ],
-  "author": "Ahmed Lebda",
-  "license": "ISC",
-  "dependencies": {
-    "dotenv": "^16.4.5",
-    "express": "^4.21.0",
-    "pg": "^8.13.0",
-    "sequelize": "^6.37.3"
-  }
+	"name": "course-material",
+	"version": "1.0.0",
+	"description": "following part 13 course material",
+	"main": "index.js",
+	"scripts": {
+		"dev": "node --watch ./index.js",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [
+		"SQL",
+		"PostgreSQL",
+		"Express",
+		"Sequelize",
+		"NodeJS"
+	],
+	"author": "Ahmed Lebda",
+	"license": "ISC",
+	"dependencies": {
+		"dotenv": "^16.4.5",
+		"express": "^4.21.0",
+		"pg": "^8.13.0",
+		"sequelize": "^6.37.3"
+	}
 }

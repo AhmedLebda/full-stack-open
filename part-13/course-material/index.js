@@ -41,6 +41,8 @@ Note.init(
 	}
 );
 
+Note.sync();
+
 app.get("/api/notes", async (_req, res) => {
 	try {
 		const notes = await Note.findAll();
@@ -49,11 +51,26 @@ app.get("/api/notes", async (_req, res) => {
 		console.log(err);
 	}
 });
+
 app.post("/api/notes", async (req, res) => {
 	try {
 		console.log(req.body);
 		const createdNote = await Note.create(req.body);
 		res.status(201).json(createdNote);
+	} catch (err) {
+		console.log(err);
+	}
+});
+
+app.patch("/api/notes/:id", async (req, res) => {
+	try {
+		const note = await Note.findByPk(req.params.id);
+		if (!note) {
+			return res.status(404).json({ error: "Note not found" });
+		}
+		note.completed = false;
+		await note.save();
+		res.json(note);
 	} catch (err) {
 		console.log(err);
 	}
