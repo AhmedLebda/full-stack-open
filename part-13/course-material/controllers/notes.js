@@ -1,20 +1,28 @@
 const router = require("express").Router();
 
-const { Note } = require("../models/index.js");
+const { Note, User } = require("../models/index.js");
 const noteFinder = require("../middleware/note/noteFinder.js");
+const requireAuth = require("../middleware/auth/requireAuth");
 
 router.get("/", async (_req, res) => {
 	try {
-		const notes = await Note.findAll();
+		const notes = await Note.findAll({
+			attributes: { exclude: ["userId"] },
+			include: {
+				model: User,
+				attributes: ["id", "name"],
+			},
+		});
 		res.json(notes);
 	} catch (err) {
 		console.log(err);
 	}
 });
 
-router.post("/", async (req, res) => {
+router.post("/", requireAuth, async (req, res) => {
 	try {
-		const createdNote = await Note.create(req.body);
+		const user = req.user;
+		const createdNote = await Note.create({ ...req.body, userId: user.id });
 		res.status(201).json(createdNote);
 	} catch (err) {
 		console.log(err);
