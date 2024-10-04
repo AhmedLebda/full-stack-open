@@ -1,19 +1,28 @@
 const router = require("express").Router();
-const { Blog } = require("../models/index");
-const { AssociatedDataError } = require("../util/error_classes");
+const { Blog, User } = require("../models/index");
 const blogFinder = require("../middlewares/blog/blogFinder");
+const requireAuth = require("../middlewares/auth/requireAuth");
+const { PermissionError } = require("../util/error_classes");
 
 router.get("/", async (_req, res) => {
-	const blogs = await Blog.findAll();
+	const blogs = await Blog.findAll({
+		include: {
+			model: User,
+			attributes: { exclude: ["password", "createdAt", "updatedAt"] },
+		},
+	});
 	res.json(blogs);
 });
 
-router.post("/", async (req, res) => {
-	const createdBlog = await Blog.create(req.body);
+router.post("/", requireAuth, async (req, res) => {
+	const user = req.user;
+	const createdBlog = await Blog.create({ ...req.body, userId: user.id });
 	res.status(201).json(createdBlog);
 });
 
-router.delete("/:id", blogFinder, async (req, res) => {
+router.delete("/:id", requireAuth, blogFinder, async (req, res) => {
+	const user = req.user;
+	if (user.id !== req.blog.userId) throw new PermissionError("Unauthorized");
 	await req.blog.destroy();
 	res.status(204).end();
 });
