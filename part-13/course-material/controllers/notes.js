@@ -1,17 +1,28 @@
 const router = require("express").Router();
 
 const { Note, User } = require("../models/index.js");
+const { Op } = require("sequelize");
 const noteFinder = require("../middleware/note/noteFinder.js");
 const requireAuth = require("../middleware/auth/requireAuth");
 
-router.get("/", async (_req, res) => {
+router.get("/", async (req, res) => {
 	try {
+		const where = {};
+
+		if (req.query.important) {
+			where["important"] = req.query.important === "true";
+		}
+		if (req.query.search) {
+			where["content"] = { [Op.substring]: req.query.search };
+		}
+
 		const notes = await Note.findAll({
 			attributes: { exclude: ["userId"] },
 			include: {
 				model: User,
 				attributes: ["id", "name"],
 			},
+			where,
 		});
 		res.json(notes);
 	} catch (err) {
