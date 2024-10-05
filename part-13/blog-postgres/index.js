@@ -9,6 +9,7 @@ const errorHandler = require("./middlewares/error/errorHandler");
 const BlogRouter = require("./controllers/blog");
 const UserRouter = require("./controllers/user");
 const AuthRouter = require("./controllers/auth");
+const AuthorRouter = require("./controllers/author");
 
 // Middlewares
 app.use(express.json());
@@ -17,7 +18,7 @@ app.use(express.json());
 app.use("/api/blogs", BlogRouter);
 app.use("/api/users", UserRouter);
 app.use("/api/auth", AuthRouter);
-
+app.use("/api/authors", AuthorRouter);
 // Error handler
 app.use(errorHandler);
 

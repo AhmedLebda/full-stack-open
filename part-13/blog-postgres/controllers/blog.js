@@ -1,15 +1,25 @@
 const router = require("express").Router();
 const { Blog, User } = require("../models/index");
+const { Op } = require("sequelize");
 const blogFinder = require("../middlewares/blog/blogFinder");
 const requireAuth = require("../middlewares/auth/requireAuth");
 const { PermissionError } = require("../util/error_classes");
 
-router.get("/", async (_req, res) => {
+router.get("/", async (req, res) => {
+	const where = {};
+	if (req.query.search) {
+		where[Op.or] = [
+			{ title: { [Op.substring]: req.query.search } },
+			{ author: { [Op.substring]: req.query.search } },
+		];
+	}
 	const blogs = await Blog.findAll({
 		include: {
 			model: User,
 			attributes: { exclude: ["password", "createdAt", "updatedAt"] },
 		},
+		where,
+		order: [["likes", "DESC"]],
 	});
 	res.json(blogs);
 });
