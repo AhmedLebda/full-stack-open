@@ -18,7 +18,18 @@ User.init(
 			unique: true,
 			allowNull: false,
 		},
+		admin: {
+			type: DataTypes.BOOLEAN,
+			defaultValue: false,
+			allowNull: false,
+		},
+		disabled: {
+			type: DataTypes.BOOLEAN,
+			defaultValue: false,
+			allowNull: false,
+		},
 	},
+
 	{
 		sequelize,
 		modelName: "user",
