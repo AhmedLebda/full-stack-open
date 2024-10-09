@@ -2,11 +2,25 @@ const router = require("express").Router();
 
 const isAdmin = require("../middleware/auth/isAdmin");
 const requireAuth = require("../middleware/auth/requireAuth");
-const { User, Note } = require("../models/index");
+const { User, Note, Team } = require("../models/index");
 
 router.get("/", async (_req, res) => {
 	const users = await User.findAll({
-		include: { model: Note, attributes: { exclude: ["userId"] } },
+		include: [
+			{ model: Note, attributes: { exclude: ["userId"] } },
+			{
+				model: Note,
+				as: "marked_notes",
+				attributes: { exclude: ["userId"] },
+				through: { attributes: [] },
+				include: { model: User, attributes: ["name"] },
+			},
+			{
+				model: Team,
+				attributes: ["name", "id"],
+				through: { attributes: [] },
+			},
+		],
 	});
 	res.json(users);
 });
