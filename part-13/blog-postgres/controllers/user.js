@@ -2,15 +2,44 @@ const { User, Blog } = require("../models/index");
 const { AssociatedDataError } = require("../util/error_classes");
 const bcrypt = require("bcrypt");
 const { SALT_ROUNDS } = require("../util/config");
-
+const { col } = require("sequelize");
 const router = require("express").Router();
 
 router.get("/", async (_req, res) => {
 	const users = await User.findAll({
 		attributes: { exclude: ["password"] },
-		include: { model: Blog, attributes: { exclude: ["userId"] } },
 	});
+	if (users.length === 0) {
+		res.json({ message: "No users found" });
+		return;
+	}
 	res.json(users);
+});
+router.get("/:id", async (req, res) => {
+	const where = {};
+	if (req.query.read) {
+		where.read = req.query.read === "true";
+	}
+	const user = await User.findByPk(req.params.id, {
+		attributes: { exclude: ["password"] },
+		include: [
+			{
+				model: Blog,
+				as: "created_blogs",
+				attributes: { exclude: ["userId"] },
+			},
+			{
+				model: Blog,
+				as: "reading_list",
+				attributes: ["id"],
+				through: { attributes: ["read"], where },
+			},
+		],
+	});
+	if (!user) throw new AssociatedDataError("User not found");
+	let result;
+
+	res.json(user);
 });
 
 router.post("/", async (req, res) => {
