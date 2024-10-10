@@ -2,7 +2,6 @@ const { User, Blog } = require("../models/index");
 const { AssociatedDataError } = require("../util/error_classes");
 const bcrypt = require("bcrypt");
 const { SALT_ROUNDS } = require("../util/config");
-const { col } = require("sequelize");
 const router = require("express").Router();
 
 router.get("/", async (_req, res) => {

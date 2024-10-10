@@ -30,12 +30,39 @@ User.init(
 			type: DataTypes.STRING,
 			allowNull: false,
 		},
+		disabled: {
+			type: DataTypes.BOOLEAN,
+			defaultValue: false,
+			allowNull: false,
+			validate: {
+				isBoolean: true,
+			},
+		},
+		activeSession: {
+			type: DataTypes.STRING,
+			defaultValue: null,
+		},
 	},
 	{
 		sequelize,
 		modelName: "user",
 		timestamps: true,
 		underscored: true,
+		defaultScope: {
+			attributes: { exclude: ["password", "activeSession"] },
+			where: {
+				disabled: false,
+			},
+		},
+		scopes: {
+			disabled: { where: { disabled: true } },
+			withPassword: {
+				attributes: { include: ["password"] },
+			},
+			activeSession: {
+				attributes: { include: ["activeSession"] },
+			},
+		},
 	}
 );
 
